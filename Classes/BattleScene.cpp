@@ -56,5 +56,5 @@ void Battle::menuReturnCallBack(Ref * pSender) {
 //进入单人训练地图,注意最初的场景还被挂起，需要丢掉
 void Battle::menuOneTrainCallBack(Ref* pSender) {
 	auto oneTrainScene = OneTrain::createScene();
-	Director::getInstance()->pushScene(oneTrainScene);
+	Director::getInstance()->replaceScene(oneTrainScene);
 }
