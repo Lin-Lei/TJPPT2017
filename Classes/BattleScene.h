@@ -2,6 +2,7 @@
 #define __Battle_SCENE_H__
 #include "cocos2d.h"
 #include"OneTrain.h"
+#include"SimpleAudioEngine.h"
 
 class Battle : public cocos2d::Layer{
 public:

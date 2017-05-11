@@ -1,6 +1,11 @@
 #include"OneTrain.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
+
+extern bool musicSet;
+extern bool first;
+extern bool soundSet;
 
 Scene* OneTrain::createScene(){
 	auto scene = Scene::create();
@@ -19,7 +24,7 @@ bool OneTrain::init(){
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	//创建外边款
-	auto oneTrainScene = Sprite::create("_battle.jpg");
+	auto oneTrainScene = Sprite::create("background/_battle.jpg");
 	oneTrainScene->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
 	addChild(oneTrainScene,0);
 
@@ -31,11 +36,11 @@ bool OneTrain::init(){
 	
 	//退出图片菜单
 	auto closeItem = MenuItemImage::create(
-		"backnormal.jpg",
-		"backselect.jpg",
+		"button/backnormal.jpg",
+		"button/backselect.jpg",
 		CC_CALLBACK_1(OneTrain::menuReturnCallback, this));
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width -150,
-		origin.y + 80));
+	closeItem->setPosition(Vec2(origin.x + visibleSize.width -175,
+		origin.y + 45));
 	auto menu = Menu::create (closeItem, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 2);
@@ -102,14 +107,23 @@ bool OneTrain::init(){
 	return true;
 }
 
+//进入游戏场景
+void OneTrain::onEnterTransitionDidFinish() {
+	Layer::onEnterTransitionDidFinish();
+	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3");
+	first = true;
+}
 
+//清除场景
+void OneTrain::cleanup() {
+	Layer::cleanup();
+	if(musicSet) SimpleAudioEngine::getInstance()->stopBackgroundMusic("music/gamestartmusic.mp3");
+}
+
+//返回主界面
 void OneTrain::menuReturnCallback(cocos2d::Ref* pSender) {
+	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
 	Director::getInstance()->popScene();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-	exit(0);
-#endif
-
 }
 
 void OneTrain::update(float dt)

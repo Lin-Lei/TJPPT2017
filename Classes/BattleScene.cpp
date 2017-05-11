@@ -1,6 +1,9 @@
 #include"BattleScene.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
+
+extern bool soundSet;
 
 Scene* Battle::createScene(){
 	auto scene = Scene::create();
@@ -20,7 +23,7 @@ bool Battle::init(){
 
 
 	//创建battle的背景图
-	Sprite *settingBackGround = Sprite::create("battle.jpg");
+	Sprite *settingBackGround = Sprite::create("background/battle.jpg");
 	settingBackGround->setPosition(Vec2(origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height / 2));
 	this->addChild(settingBackGround);
@@ -28,15 +31,15 @@ bool Battle::init(){
 
 	//单人训练图片菜单
 	auto oneTrainMenuItem = MenuItemImage::create(
-		"onetrainnormal.jpg",
-		"onetrainselect.jpg",
+		"button/onetrainnormal.jpg",
+		"button/onetrainselect.jpg",
 		CC_CALLBACK_1(Battle::menuOneTrainCallBack, this));
 	oneTrainMenuItem->setPosition(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2);
 
 	//返回图片菜单
 	auto returnMenuItem = MenuItemImage::create(
-		"backnormal.jpg",
-		"backselect.jpg",
+		"button/backnormal.jpg",
+		"button/backselect.jpg",
 		CC_CALLBACK_1(Battle::menuReturnCallBack, this));
 	returnMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 50));
 
@@ -50,11 +53,13 @@ bool Battle::init(){
 
 //返回上一场景
 void Battle::menuReturnCallBack(Ref * pSender) {
+	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
 	Director::getInstance()->popScene();
 }
 
-//进入单人训练地图,注意最初的场景还被挂起，需要丢掉
+//进入单人训练地图
 void Battle::menuOneTrainCallBack(Ref* pSender) {
+	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
 	auto oneTrainScene = OneTrain::createScene();
 	Director::getInstance()->replaceScene(oneTrainScene);
 }

@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include"Hero.h"
+#include"SimpleAudioEngine.h"
 
 class OneTrain : public cocos2d::Layer
 {
@@ -19,12 +20,13 @@ class OneTrain : public cocos2d::Layer
 public:
 	static cocos2d::Scene* createScene();
 	virtual bool init();
-	void menuReturnCallback(cocos2d::Ref* pSender);
+	virtual void OneTrain::update(float dt);
+	virtual void OneTrain::onEnterTransitionDidFinish();
+	virtual void OneTrain::cleanup();
 
+	void menuReturnCallback(cocos2d::Ref* pSender);
 	void OneTrain::resetKeyCodeMap();
 	bool checkArrow(cocos2d::EventKeyboard::KeyCode keyCode);
-
-	virtual void OneTrain::update(float dt);
 
 	CREATE_FUNC(OneTrain);
 
