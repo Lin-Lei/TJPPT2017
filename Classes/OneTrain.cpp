@@ -46,7 +46,8 @@ bool OneTrain::init(){
 	this->addChild(menu, 2);
 
 	//创建人物
-	hero = Hero::create("hero/hero_down_1.png");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero1Basic.plist");
+	hero = Hero::create("hero1Down.png");
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
@@ -55,7 +56,7 @@ bool OneTrain::init(){
 	resetKeyCodeMap();
 	
 	pressCnt = 0; //优化多按键时的判定
-	validPress = true;
+	validPress = false;
 
 	//注册 键盘事件监听器
 	heroKeyboardListener = EventListenerKeyboard::create();
@@ -63,6 +64,12 @@ bool OneTrain::init(){
 
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
+		if (hero->getAnimationPlaying())
+		{
+			hero->stopAllActions();
+			hero->setAnimationPlaying(false);
+		}
+		
 		if (checkArrow(keyCode))
 		{
 			validPress = true;
@@ -81,6 +88,8 @@ bool OneTrain::init(){
 			if (pressCnt == 1)
 			{
 				validPress = true;
+				hero->stopAllActions();
+				hero->setAnimationPlaying(false);
 				std::map<cocos2d::EventKeyboard::KeyCode, bool>::iterator it;
 				for (it = keyCodeMap.begin(); it != keyCodeMap.end(); it++)
 				{
@@ -93,6 +102,12 @@ bool OneTrain::init(){
 			else
 			{
 				validPress = false;
+				if (hero->getAnimationPlaying())
+				{
+					hero->stopAllActions();
+					hero->setAnimationPlaying(false);
+				}
+				hero->setFrame(keyCode);
 			}
 		}
 		
@@ -128,9 +143,11 @@ void OneTrain::menuReturnCallback(cocos2d::Ref* pSender) {
 
 void OneTrain::update(float dt)
 {
+
 	if (validPress)
 	{
 		hero->moveHero(onPressCode);
+		hero->setAnimationPlaying(true);
 	}
 	
 }

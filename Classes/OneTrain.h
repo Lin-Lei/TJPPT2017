@@ -12,9 +12,9 @@ class OneTrain : public cocos2d::Layer
 	cocos2d::EventListenerKeyboard *heroKeyboardListener;
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keyCodeMap;
 
-	CC_SYNTHESIZE(int, pressCnt, PressCnt);//优化多按键时的判定，优化体验
-	CC_SYNTHESIZE(cocos2d::EventKeyboard::KeyCode, onPressCode, OnPressCode);
-	CC_SYNTHESIZE(bool, validPress, ValidPress);
+	int pressCnt;//优化多按键时的判定，优化体验
+	cocos2d::EventKeyboard::KeyCode onPressCode;
+	bool validPress;
 	
 
 public:
