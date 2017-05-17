@@ -2,16 +2,28 @@
 
 USING_NS_CC;
 
+extern TMXLayer* collidable;//检测碰撞
+extern TMXTiledMap* oneTrainMap;//指向地图的
+
+/*
+人物锚点设置不当
+由于锚点改变而引发的边界问题处理不当
+getposition得到的是最外层边界
+实际上我们只想要瓦片地图的边界
+这里会出现负值导致触发断点
+*/
+
 Hero::Hero(int power, int speed, int number)
 {
-	setBubblePower(power);
+	bubblePower = power;
 	setMovingSpeed(speed);
-	setBubbleNumber(number);
-	setPlacedBubbleNum(0);
+	bubbleNumber = number;
+	placeBubbleNumber = 0;
 
 	animationPlaying = false;
 }
 
+//创建人物
 Hero* Hero::create(const std::string& spriteFrameName)
 {
 	Hero *hero = new Hero();
@@ -27,6 +39,7 @@ Hero* Hero::create(const std::string& spriteFrameName)
 	return NULL;
 }
 
+//设置位置
 void Hero::setPosition(const Vec2 &position)
 {
 	Size screenSize = Director::getInstance()->getVisibleSize();
@@ -51,13 +64,13 @@ void Hero::setPosition(const Vec2 &position)
 	}
 
 	Sprite::setPosition(Vec2(pos_x, pos_y));
-	Sprite::setAnchorPoint(Vec2(0.5f, 0.5f));
+	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }
 
+//人物移动
 void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 {
 	Vec2 position = this->getPosition();
-
 	switch (keyCode)
 	{
 	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
@@ -133,7 +146,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	default:
 		break;
 	}
-
 	this->setPosition(position);
 }
 

@@ -1,4 +1,5 @@
 #include"OneTrain.h"
+#include"Vector"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -6,6 +7,9 @@ using namespace CocosDenshion;
 extern bool musicSet;
 extern bool first;
 extern bool soundSet;
+
+TMXLayer* collidable;//检测碰撞
+TMXTiledMap* oneTrainMap;//指向地图的
 
 Scene* OneTrain::createScene(){
 	auto scene = Scene::create();
@@ -33,20 +37,27 @@ bool OneTrain::init(){
 	oneTrainMap->setAnchorPoint(Vec2(0.5, 0.5));
 	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-75, origin.y + visibleSize.height / 2));
 	addChild(oneTrainMap, 1);
+
+	collidable = oneTrainMap->getLayer("collidable");//创建碰撞层
 	
-	//退出图片菜单
-	auto closeItem = MenuItemImage::create(
+	//返回图片菜单
+	auto returnItem = MenuItemImage::create(
 		"button/backnormal.jpg",
 		"button/backselect.jpg",
 		CC_CALLBACK_1(OneTrain::menuReturnCallback, this));
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width -175,
-		origin.y + 45));
-	auto menu = Menu::create (closeItem, NULL);
+	returnItem->setPosition(Vec2(origin.x + visibleSize.width -85,
+		origin.y + 25));
+	auto menu = Menu::create (returnItem, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 2);
 
 	//创建人物
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero1Basic.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero1Basic.plist");//缓存人物动画
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Bubble/bubble_all.plist");//缓存泡泡动画
+	bubble = Bubble::create("bubble0.png");
+	bubble->setAnchorPoint(Vec2(0.5f,0.5f));
+	bubble->setPosition(Vec2(origin.x , origin.y ));
+	this->addChild(bubble, 9);
 	hero = Hero::create("hero1Down.png");
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
@@ -61,10 +72,13 @@ bool OneTrain::init(){
 	//注册 键盘事件监听器
 	heroKeyboardListener = EventListenerKeyboard::create();
 	
-
+	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (hero->getAnimationPlaying())
+		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE) {
+			bubble->placeBubble(hero->getPosition(),hero);//完成放泡泡功能
+		}
+		if (hero->getAnimationPlaying())//正在做的动画停止
 		{
 			hero->stopAllActions();
 			hero->setAnimationPlaying(false);
@@ -79,6 +93,7 @@ bool OneTrain::init(){
 		}
 	};
 
+	//松开时调用
 	heroKeyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
 		if (checkArrow(keyCode))
@@ -141,7 +156,7 @@ void OneTrain::menuReturnCallback(cocos2d::Ref* pSender) {
 	Director::getInstance()->popScene();
 }
 
-void OneTrain::update(float dt)
+void OneTrain::update(float dt)//每秒60次更新
 {
 
 	if (validPress)
@@ -168,3 +183,4 @@ bool OneTrain::checkArrow(EventKeyboard::KeyCode keyCode)
 		|| keyCode == EventKeyboard::KeyCode::KEY_UP_ARROW
 		|| keyCode == EventKeyboard::KeyCode::KEY_DOWN_ARROW);
 }
+
