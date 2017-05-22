@@ -22,7 +22,7 @@ class Hero : public cocos2d::Sprite
 
 public:
 	
-	Hero(int power = 2, int speed = 1, int number = 4);
+	Hero(int power = 2, int speed = 5, int number = 4);
 	int bubblePower, bubbleNumber, placeBubbleNumber;
 
 	static Hero* create(const std::string &filename);
@@ -30,6 +30,8 @@ public:
 	void setPosition(const cocos2d::Vec2 &position);
 	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);
 	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);
+
+	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 position);
 };
 
 #endif //__FIGHTER_SPRITE_H__

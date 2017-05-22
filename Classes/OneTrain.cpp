@@ -35,10 +35,10 @@ bool OneTrain::init(){
 	//创建个人训练地图
 	oneTrainMap = TMXTiledMap::create("map/onetrainmap.tmx");
 	oneTrainMap->setAnchorPoint(Vec2(0.5, 0.5));
-	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-75, origin.y + visibleSize.height / 2));
+	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-80, origin.y + visibleSize.height / 2));
 	addChild(oneTrainMap, 1);
 
-	collidable = oneTrainMap->getLayer("collidable");//创建碰撞层
+	collidable = oneTrainMap->getLayer("building");//创建碰撞层
 	
 	//返回图片菜单
 	auto returnItem = MenuItemImage::create(

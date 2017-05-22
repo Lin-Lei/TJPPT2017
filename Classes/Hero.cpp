@@ -49,19 +49,21 @@ void Hero::setPosition(const Vec2 &position)
 	float pos_x = position.x;
 	float pos_y = position.y;
 
-	if (pos_x < Width) {
-		pos_x = Width;
+	if (pos_x < 20 + Width / 2) {
+		pos_x = 20 + Width / 2;
 	}
-	else if (pos_x >(screenSize.width)) {
-		pos_x = screenSize.width;
+	else if (pos_x >620 - Width / 2) {
+		pos_x = 620 - Width / 2;
 	}
 
-	if (pos_y < Height) {
-		pos_y = Height;
+	if (pos_y < 40 + Height / 10) {
+		pos_y = 40 + Height / 10;
 	}
-	else if (pos_y >(screenSize.height)) {
-		pos_y = screenSize.height;
+	else if (pos_y >560 - Height * 0.5) {
+		pos_y = 560 - Height * 0.5;
 	}
+
+	
 
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
@@ -71,6 +73,8 @@ void Hero::setPosition(const Vec2 &position)
 void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 {
 	Vec2 position = this->getPosition();
+	log("%f, %f", position.x, position.y);
+
 	switch (keyCode)
 	{
 	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
@@ -146,6 +150,18 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	default:
 		break;
 	}
+
+	//从像素点坐标转化为瓦片坐标
+	Vec2 tileCoord = this->tileCoordFromPosition(position);
+	//获得瓦片的GID
+	int tileGid = collidable->getTileGIDAt(tileCoord);
+
+	if (tileGid > 0) {
+		
+		position = this->getPosition();
+	}
+
+
 	this->setPosition(position);
 }
 
@@ -184,4 +200,12 @@ void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 	default:
 		break;
 	}
+}
+
+Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标
+{
+	int x = (position.x - 20) / oneTrainMap->getTileSize().width ;
+	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y + 40)
+		/ oneTrainMap->getTileSize().height ;
+	return Vec2(x, y);
 }

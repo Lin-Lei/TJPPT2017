@@ -2,17 +2,14 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="1">
  <tileset firstgid="1" name="TownGround" tilewidth="40" tileheight="40" tilecount="7" columns="7">
   <image source="TownGround.jpg" width="280" height="40"/>
-  <tile id="6">
+ </tileset>
+ <tileset firstgid="8" name="TownBox" tilewidth="40" tileheight="40" tilecount="1" columns="1">
+  <image source="TownBox.jpg" width="40" height="44"/>
+  <tile id="0">
    <properties>
     <property name="Collidable" value="true"/>
    </properties>
   </tile>
- </tileset>
- <tileset firstgid="8" name="TownBox" tilewidth="40" tileheight="40" tilecount="1" columns="1">
-  <properties>
-   <property name="Collidable" value="true"/>
-  </properties>
-  <image source="TownBox.jpg" width="40" height="44"/>
  </tileset>
  <layer name="ground" width="15" height="13">
   <data encoding="csv">
@@ -38,31 +35,14 @@
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
-8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
-8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
-8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
+8,8,8,0,8,8,0,0,0,0,0,8,8,8,8,
+8,8,0,0,0,0,0,0,0,0,0,8,8,8,8,
+8,8,8,0,8,8,0,0,0,0,0,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8
-</data>
- </layer>
- <layer name="collidable" width="15" height="13" opacity="0">
-  <data encoding="csv">
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,
-7,7,7,7,7,7,0,0,0,7,7,7,7,7,7
 </data>
  </layer>
 </map>
