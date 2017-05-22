@@ -45,11 +45,9 @@ void Bubble::innitAnimation(Animation * ani, int n, const char s[]) {//³É¹¦ÓÅ»¯£
 
 Vec2 Bubble::tileCoordFromPosition(Vec2 position)//ÄÃµ½µÄÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖĞµÄ×ø±ê
 {
-	log("scene_x=%f,y=%f", position.x, position.y);
 	int x = (position.x+10)/ oneTrainMap->getTileSize().width;
 	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y+40)
 		/ oneTrainMap->getTileSize().height+1;
-	log("x=%d_y=%d", x, y);
 	return Vec2(x, y);
 }
 
@@ -62,7 +60,7 @@ void Bubble::placeBubble(Vec2 p,Hero * hero) {//µÃµ½µÄ×ø±êÊÇÈËÎï×ø±ê
 		Sprite *bubble;
 		bubble = Sprite::createWithSpriteFrameName("bubble1.png");
 		bubble->setAnchorPoint(Vec2(0.5f, 0.5f));
-		//×ø±ê´ıµ÷Õû
+
 		Vec2 position = getPlacePosition(p);
 		xVector.push_back(position.x);
 		yVector.push_back(position.y);
@@ -75,7 +73,7 @@ void Bubble::placeBubble(Vec2 p,Hero * hero) {//µÃµ½µÄ×ø±êÊÇÈËÎï×ø±ê
 		Animate *bubbleAnimate = Animate::create(bubbleAnimation);
 		
 		auto bubbleBoomFunc = CallFunc::create(CC_CALLBACK_0(Bubble::bubbleBoom, this, hero->bubblePower));//´´½¨ÅİÅİ±¬Õ¨»Øµ÷º¯Êı
-	//	auto resetPlaceBubbleNumFunc=CallFunc::create(CC_CALLBACK_0(Bubble::reset))
+
 		auto bubbleAction = Sequence::create(Repeat::create(bubbleAnimate, 6),bubbleBoomFunc,//¼ÇµÃ°ÑÖØ¸´´ÎÊıĞŞ¸ÄÎª6
 			CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)),NULL);
 		bubble->runAction(bubbleAction);//Í¨¹ıremoveFromParentÏû³ıÁË²ĞÁôÍ¼Æ¬
@@ -168,6 +166,7 @@ void Bubble::downSpout(int power) {
 	auto action = Sequence::create(bubbleAnimate, delayTime,
 		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
 	bubble->runAction(action);
+	h->placeBubbleNumber--;//¶¯×÷Íê³Éºó£¬·ÅÅÚÊı-1
 }
 
 void Bubble::down(int power) {
@@ -249,6 +248,5 @@ void Bubble::right(int power) {
 		auto bubbleAction = Sequence::create(tempAction, delayTime,
 			CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, temp)), NULL);
 		temp->runAction(bubbleAction);
-		h->placeBubbleNumber--;//¶¯×÷Íê³Éºó£¬·ÅÅÚÊı-1
 	}
 }

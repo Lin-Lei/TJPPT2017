@@ -2,25 +2,30 @@
 
 USING_NS_CC;
 
-extern TMXLayer* collidable;//检测碰撞
+extern TMXLayer* building;
 extern TMXTiledMap* oneTrainMap;//指向地图的
 
-/*
-人物锚点设置不当
-由于锚点改变而引发的边界问题处理不当
-getposition得到的是最外层边界
-实际上我们只想要瓦片地图的边界
-这里会出现负值导致触发断点
-*/
+Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,输出瓦片坐标
+{
+	int x = (position.x + 10) / oneTrainMap->getTileSize().width;
+	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y + 40)
+		/ oneTrainMap->getTileSize().height + 1;
+	return Vec2(x, y);
+}
+
 
 Hero::Hero(int power, int speed, int number)
 {
 	bubblePower = power;
-	setMovingSpeed(speed);
+	movingSpeed=speed;
 	bubbleNumber = number;
 	placeBubbleNumber = 0;
 
 	animationPlaying = false;
+
+	shoseLayer = oneTrainMap->getLayer("speed");
+	powerLayer = oneTrainMap->getLayer("bubblePower");
+	numLayer = oneTrainMap->getLayer("bubbleNum");
 }
 
 //创建人物
@@ -44,24 +49,26 @@ void Hero::setPosition(const Vec2 &position)
 {
 	Size screenSize = Director::getInstance()->getVisibleSize();
 
-	float Width = this->getContentSize().width ;
+	float Width = this->getContentSize().width;
 	float Height = this->getContentSize().height;
 	float pos_x = position.x;
 	float pos_y = position.y;
 
-	if (pos_x < Width) {
-		pos_x = Width;
+	if (pos_x < 20 + Width / 2) {
+		pos_x = 20 + Width / 2;
 	}
-	else if (pos_x >(screenSize.width)) {
-		pos_x = screenSize.width;
+	else if (pos_x >620 - Width / 2) {
+		pos_x = 620 - Width / 2;
 	}
 
-	if (pos_y < Height) {
-		pos_y = Height;
+	if (pos_y < 40 + Height / 10) {
+		pos_y = 40 + Height / 10;
 	}
-	else if (pos_y >(screenSize.height)) {
-		pos_y = screenSize.height;
+	else if (pos_y >560 - Height * 0.5) {
+		pos_y = 560 - Height * 0.5;
 	}
+
+
 
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
@@ -75,6 +82,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	{
 	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
 		position.x -= movingSpeed;
+		judgeOnProps(position);
 		if (!animationPlaying)
 		{
 			Animation *moveLeftAnimation = Animation::create();
@@ -93,6 +101,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 		
 		position.x += movingSpeed;
+		judgeOnProps(position);
 		if (!animationPlaying)
 		{
 			Animation *moveRightAnimation = Animation::create();
@@ -110,6 +119,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 		
 	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 		position.y -= movingSpeed;
+		judgeOnProps(position);
 		if (!animationPlaying)
 		{
 			Animation *moveDownAnimation = Animation::create();
@@ -127,6 +137,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 		
 	case EventKeyboard::KeyCode::KEY_UP_ARROW:
 		position.y += movingSpeed;
+		judgeOnProps(position);
 		if (!animationPlaying)
 		{
 			Animation *moveUpAnimation = Animation::create();
@@ -146,6 +157,17 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	default:
 		break;
 	}
+
+
+	//从像素点坐标转化为瓦片坐标
+	Vec2 tileCoord = tileCoordFromPosition(position);
+	//获得瓦片的GID
+	int tileGid = building->getTileGIDAt(Vec2(tileCoord.x-1,tileCoord.y-1));
+	if (tileGid > 0) {
+		position = this->getPosition();
+	}
+
+
 	this->setPosition(position);
 }
 
@@ -183,5 +205,28 @@ void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 
 	default:
 		break;
+	}
+}
+
+void Hero::judgeOnProps(const Vec2 pos) {
+	Vec2 tileCoord = tileCoordFromPosition(pos);
+	int tileGid= powerLayer->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	if (tileGid) {
+		bubblePower++;
+		powerLayer->removeTileAt(Vec2(tileCoord.x-1,tileCoord.y-1));
+	}
+
+	tileGid = numLayer->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+
+	if (tileGid) {
+		bubbleNumber++;
+		numLayer->removeTileAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	}
+
+	tileGid = shoseLayer->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+
+	if (tileGid) {
+		movingSpeed++;
+		shoseLayer->removeTileAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
 	}
 }

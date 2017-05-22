@@ -17,14 +17,16 @@ typedef enum
 
 class Hero : public cocos2d::Sprite
 {
-	CC_SYNTHESIZE(int, movingSpeed, MovingSpeed);;
 	CC_SYNTHESIZE(bool, animationPlaying, AnimationPlaying);
-
+	cocos2d::TMXLayer* shoseLayer;
+	cocos2d::TMXLayer* powerLayer;
+	cocos2d::TMXLayer* numLayer;
 public:
 	
-	Hero(int power = 2, int speed = 1, int number = 4);
-	int bubblePower, bubbleNumber, placeBubbleNumber;
-
+	void judgeOnProps(const cocos2d::Vec2 pos);
+	Hero(int power = 1, int speed = 3, int number = 1);
+	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;
+	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
 	static Hero* create(const std::string &filename);
 		
 	void setPosition(const cocos2d::Vec2 &position);

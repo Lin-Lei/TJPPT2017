@@ -8,7 +8,7 @@ extern bool musicSet;
 extern bool first;
 extern bool soundSet;
 
-TMXLayer* collidable;//检测碰撞
+TMXLayer* building;
 TMXTiledMap* oneTrainMap;//指向地图的
 
 Scene* OneTrain::createScene(){
@@ -35,10 +35,10 @@ bool OneTrain::init(){
 	//创建个人训练地图
 	oneTrainMap = TMXTiledMap::create("map/onetrainmap.tmx");
 	oneTrainMap->setAnchorPoint(Vec2(0.5, 0.5));
-	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-75, origin.y + visibleSize.height / 2));
+	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-80, origin.y + visibleSize.height / 2));
 	addChild(oneTrainMap, 1);
-
-	collidable = oneTrainMap->getLayer("collidable");//创建碰撞层
+	
+	building = oneTrainMap->getLayer("building");
 	
 	//返回图片菜单
 	auto returnItem = MenuItemImage::create(
@@ -61,6 +61,7 @@ bool OneTrain::init(){
 	hero = Hero::create("hero1Down.png");
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
+
 
 	//初始化Map容器
 	keyCodeMap = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
@@ -140,7 +141,7 @@ bool OneTrain::init(){
 //进入游戏场景
 void OneTrain::onEnterTransitionDidFinish() {
 	Layer::onEnterTransitionDidFinish();
-	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3");
+	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3",true);
 	first = true;
 }
 

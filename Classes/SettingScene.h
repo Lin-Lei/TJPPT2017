@@ -8,8 +8,6 @@ class Setting : public cocos2d::Layer
 	bool isEffect;
 public:
 	virtual bool init();
-	/*virtual void onEnterTransitionDidFinish();
-	virtual void cleanup();*/			//没有必要重新开始音乐
 
 	static cocos2d::Scene* createScene();
 	void Setting::menuOkCallBack(Ref * pSender);
