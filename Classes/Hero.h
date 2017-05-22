@@ -22,7 +22,9 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* powerLayer;
 	cocos2d::TMXLayer* numLayer;
 public:
-	
+	cocos2d::TMXLayer* building;
+	cocos2d::TMXTiledMap* map;
+	void setPointer(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	void judgeOnProps(const cocos2d::Vec2 pos);
 	Hero(int power = 1, int speed = 3, int number = 1);
 	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;

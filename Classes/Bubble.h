@@ -18,6 +18,10 @@ class Bubble : public cocos2d::Sprite
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 public:
+	bool judgeBuilding(cocos2d::Vec2 pos);
+	cocos2d::TMXLayer* building;
+	cocos2d::TMXTiledMap* map;
+	void setPointer(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	static Bubble* create(const std::string &filename);
 	void placeBubble(cocos2d::Vec2 pos,Hero* hero);
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);

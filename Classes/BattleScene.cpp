@@ -43,7 +43,14 @@ bool Battle::init(){
 		CC_CALLBACK_1(Battle::menuReturnCallBack, this));
 	returnMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 50));
 
-	Menu *mn = Menu::create(oneTrainMenuItem,returnMenuItem, NULL);
+	//双人对战图片菜单
+	auto doubleBattleMenuItem = MenuItemImage::create(
+		"button/doublenormal.jpg",
+		"button/doubleselect.jpg",
+		CC_CALLBACK_1(Battle::menuDoubleBattleCallBack, this));
+	doubleBattleMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 100));
+
+	Menu *mn = Menu::create(oneTrainMenuItem,returnMenuItem,doubleBattleMenuItem, NULL);
 	mn->setPosition(Vec2::ZERO);
 	this->addChild(mn,1);
 
@@ -62,4 +69,11 @@ void Battle::menuOneTrainCallBack(Ref* pSender) {
 	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
 	auto oneTrainScene = OneTrain::createScene();
 	Director::getInstance()->replaceScene(oneTrainScene);
+}
+
+//进入双人对战地图
+void Battle::menuDoubleBattleCallBack(Ref* pSender) {
+	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
+	auto doubleBattleScene = DoubleBattle::createScene();
+	Director::getInstance()->replaceScene(doubleBattleScene);
 }

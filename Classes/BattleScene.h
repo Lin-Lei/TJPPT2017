@@ -3,6 +3,7 @@
 #include "cocos2d.h"
 #include"OneTrain.h"
 #include"SimpleAudioEngine.h"
+#include"DoubleBattle.h"
 
 class Battle : public cocos2d::Layer{
 public:
@@ -11,6 +12,7 @@ public:
 
 	void Battle::menuReturnCallBack(Ref * pSender);
 	void Battle::menuOneTrainCallBack(Ref * pSender);
+	void Battle::menuDoubleBattleCallBack(Ref * pSnder);
 
 	CREATE_FUNC(Battle);
 };

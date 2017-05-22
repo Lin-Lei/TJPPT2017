@@ -2,15 +2,21 @@
 
 USING_NS_CC;
 
-extern TMXLayer* building;
-extern TMXTiledMap* oneTrainMap;//指向地图的
 
 Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,输出瓦片坐标
 {
-	int x = (position.x + 10) / oneTrainMap->getTileSize().width;
-	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y + 40)
-		/ oneTrainMap->getTileSize().height + 1;
+	int x = (position.x + 10) / map->getTileSize().width;
+	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y + 40)
+		/ map->getTileSize().height +1;
 	return Vec2(x, y);
+}
+
+void Hero::setPointer(TMXLayer* Building,TMXTiledMap* Map) {
+	building = Building;
+	map = Map;
+	shoseLayer = map->getLayer("speed");
+	powerLayer = map->getLayer("bubblePower");
+	numLayer = map->getLayer("bubbleNum");
 }
 
 
@@ -22,10 +28,6 @@ Hero::Hero(int power, int speed, int number)
 	placeBubbleNumber = 0;
 
 	animationPlaying = false;
-
-	shoseLayer = oneTrainMap->getLayer("speed");
-	powerLayer = oneTrainMap->getLayer("bubblePower");
-	numLayer = oneTrainMap->getLayer("bubbleNum");
 }
 
 //创建人物

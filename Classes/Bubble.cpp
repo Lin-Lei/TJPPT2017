@@ -2,9 +2,6 @@
 #include"vector"
 USING_NS_CC;
 
-extern TMXLayer* collidable;//¼ì²âÅö×²
-extern TMXTiledMap* oneTrainMap;//Ö¸ÏòµØÍ¼µÄ
-
 std::vector<float>xVector;//¼ÇÂ¼Ã¿´Î·ÅÅÚµÄÎ»ÖÃ
 std::vector<float>yVector;//Õâ»áµ¼ÖÂ£¬vectorÔö³¤
 Hero *h;//ÔÚ×îºó½øĞĞ·ÅÅÚÊı¼õĞ¡²Ù×÷¡£ÒÅÁô¶àÈËÎï·ÅÅÚÊ±¿ÉÄÜ³öÏÖbug
@@ -25,11 +22,16 @@ Bubble* Bubble::create(const std::string& spriteFrameName)
 	return NULL;
 }
 
+void Bubble::setPointer(TMXLayer* Building,TMXTiledMap* Map) {
+	building = Building;
+	map = Map;
+}
+
 Vec2 Bubble::getPlacePosition(Vec2 position) {//µÃµ½ÈËÎï×ø±ê£¬Êä³öÅİÅİ×ø±ê
 	Vec2 post = tileCoordFromPosition(position);
-	float x= (post.x - 1)*oneTrainMap->getTileSize().width + oneTrainMap->getTileSize().width / 2 + 47;
-	float y= (oneTrainMap->getMapSize().height - post.y)*oneTrainMap->getTileSize().height +
-		oneTrainMap->getTileSize().height + 40;
+	float x= (post.x - 1)*map->getTileSize().width + map->getTileSize().width / 2 + 47;
+	float y= (map->getMapSize().height - post.y)*map->getTileSize().height +
+		map->getTileSize().height + 40;
 	return Vec2(x, y);
 }
 
@@ -43,11 +45,21 @@ void Bubble::innitAnimation(Animation * ani, int n, const char s[]) {//³É¹¦ÓÅ»¯£
 	}
 }
 
+bool Bubble::judgeBuilding(Vec2 pos) {
+	Vec2 tileCoord = tileCoordFromPosition(pos);
+	int tileGid = building->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	if (tileGid) {//Èç¹ûÓöµ½¿É±»Õ¨»ÙµÄ½¨ÖşÎï
+		building->removeTileAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+		return true;
+	}
+	return false;
+}
+
 Vec2 Bubble::tileCoordFromPosition(Vec2 position)//ÄÃµ½µÄÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖĞµÄ×ø±ê
 {
-	int x = (position.x+10)/ oneTrainMap->getTileSize().width;
-	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y+40)
-		/ oneTrainMap->getTileSize().height+1;
+	int x = (position.x+10)/ map->getTileSize().width;
+	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y+40)
+		/ map->getTileSize().height+1;
 	return Vec2(x, y);
 }
 
@@ -91,16 +103,12 @@ void Bubble::bubbleBoom(int power) {
 	bubbleCenterAnimation->setDelayPerUnit(0.1f);//Á½Ö¡Ö®¼äÑÓ³Ù
 	Animate *bubbleCenterAnimate = Animate::create(bubbleCenterAnimation);//´´½¨ÅİÅİÖĞ¼ä±¬Õ¨¶¯»­
 
-	auto leftSpoutAction = CallFunc::create(CC_CALLBACK_0(Bubble::leftSpout, this, power));//ÓÉÓÚÃ¿¸ö¶¯×÷¶¼ĞèÒª´´½¨Ò»¸ö¾«Áé
-	auto rightSpoutAction = CallFunc::create(CC_CALLBACK_0(Bubble::rightSpout, this,power));//ËùÒÔĞèÒªÓÃº¯Êı»Øµ÷
-	auto upSpoutAction = CallFunc::create(CC_CALLBACK_0(Bubble::upSpout, this,power));
-	auto downSpoutAction = CallFunc::create(CC_CALLBACK_0(Bubble::downSpout, this,power));
 	auto upAction = CallFunc::create(CC_CALLBACK_0(Bubble::up, this, power));
 	auto rightAction = CallFunc::create(CC_CALLBACK_0(Bubble::right, this, power));
 	auto leftAction = CallFunc::create(CC_CALLBACK_0(Bubble::left, this, power));
 	auto downAction = CallFunc::create(CC_CALLBACK_0(Bubble::down, this, power));
-	auto spawnAction = Spawn::create(bubbleCenterAnimate,leftSpoutAction,rightSpoutAction,downAction,upAction,
-		leftAction,rightAction,downSpoutAction,upSpoutAction,NULL);
+	auto spawnAction = Spawn::create(bubbleCenterAnimate,downAction,upAction,
+		leftAction,rightAction,NULL);
 	auto delayTime = DelayTime::create(0.01f);
 	auto action = Sequence::create(spawnAction,delayTime,
 		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent,bubble)),NULL);
@@ -108,70 +116,29 @@ void Bubble::bubbleBoom(int power) {
 }
 
 
-void Bubble::leftSpout(int power) {
-	Sprite *bubble;
-	bubble = Sprite::createWithSpriteFrameName("leftSpout1.png");
-	bubble->setPosition(Vec2(xVector[count-1] - 40*power, yVector[count-1]));
-	this->addChild(bubble);
-	Animation *bubbleLeftAnimation = Animation::create();
-	innitAnimation(bubbleLeftAnimation, 12, "leftSpout");
-	bubbleLeftAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
-	Animate *bubbleAnimate = Animate::create(bubbleLeftAnimation);
-	auto delayTime = DelayTime::create(0.01f);
-	auto action = Sequence::create(bubbleAnimate, delayTime,
-		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
-	bubble->runAction(action);
-}
-
-void Bubble::rightSpout(int power) {
-	Sprite * bubble;
-	bubble = Sprite::createWithSpriteFrameName("rightSpout1.png");
-	bubble->setPosition(Vec2(xVector[count-1] + 40 * power, yVector[count-1]));
-	this->addChild(bubble);
-	Animation *bubbleAnimation = Animation::create();
-	innitAnimation(bubbleAnimation, 12, "rightSpout");
-	bubbleAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
-	Animate *bubbleAnimate = Animate::create(bubbleAnimation);
-	auto delayTime = DelayTime::create(0.01f);
-	auto action = Sequence::create(bubbleAnimate, delayTime,
-		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
-	bubble->runAction(action);
-}
-
-void Bubble::upSpout(int power) {
-	Sprite * bubble;
-	bubble = Sprite::createWithSpriteFrameName("upSpout1.png");
-	bubble->setPosition(Vec2(xVector[count-1], yVector[count-1] + 40 * power));
-	this->addChild(bubble);
-	Animation *bubbleAnimation = Animation::create();
-	innitAnimation(bubbleAnimation, 12, "upSpout");
-	bubbleAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
-	Animate *bubbleAnimate = Animate::create(bubbleAnimation);
-	auto delayTime = DelayTime::create(0.01f);
-	auto action = Sequence::create(bubbleAnimate, delayTime,
-		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
-	bubble->runAction(action);
-}
-
-void Bubble::downSpout(int power) {
-	Sprite * bubble;
-	bubble = Sprite::createWithSpriteFrameName("downSpout1.png");
-	bubble->setPosition(Vec2(xVector[count-1], yVector[count-1] - 40 * power));
-	this->addChild(bubble);
-	Animation *bubbleAnimation = Animation::create();
-	innitAnimation(bubbleAnimation, 12, "downSpout");
-	bubbleAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
-	Animate *bubbleAnimate = Animate::create(bubbleAnimation);
-	auto delayTime = DelayTime::create(0.01f);
-	auto action = Sequence::create(bubbleAnimate, delayTime,
-		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
-	bubble->runAction(action);
-	h->placeBubbleNumber--;//¶¯×÷Íê³Éºó£¬·ÅÅÚÊı-1
-}
-
 void Bubble::down(int power) {
-	if (power == 1) return;
+	if (power == 1) {
+		h->placeBubbleNumber--;//¶¯×÷Íê³Éºó£¬·ÅÅÚÊı-1
+		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] - 40 * h->bubblePower))) return;
+		Sprite * bubble;
+		bubble = Sprite::createWithSpriteFrameName("downSpout1.png");
+		bubble->setPosition(Vec2(xVector[count - 1], yVector[count - 1] - 40 * h->bubblePower));
+		this->addChild(bubble);
+		Animation *bubbleAnimation = Animation::create();
+		innitAnimation(bubbleAnimation, 12, "downSpout");
+		bubbleAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
+		Animate *bubbleAnimate = Animate::create(bubbleAnimation);
+		auto delayTime = DelayTime::create(0.01f);
+		auto action = Sequence::create(bubbleAnimate, delayTime,
+			CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
+		bubble->runAction(action);
+		return;
+	}
 	else {
+		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] - 40 * (power - 1)))) {
+			h->placeBubbleNumber--;
+			return;
+		}
 		Sprite * temp;
 		temp = Sprite::createWithSpriteFrameName("down1.png");
 		temp->setPosition(Vec2(xVector[count-1],yVector[count-1]-40*(power-1)));
@@ -190,8 +157,24 @@ void Bubble::down(int power) {
 }
 
 void Bubble::up(int power) {
-	if (power == 1) return;
+	if (power == 1) {
+		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] + 40 * h->bubblePower))) return;
+		Sprite * bubble;
+		bubble = Sprite::createWithSpriteFrameName("upSpout1.png");
+		bubble->setPosition(Vec2(xVector[count - 1], yVector[count - 1] + 40 * h->bubblePower));
+		this->addChild(bubble);
+		Animation *bubbleAnimation = Animation::create();
+		innitAnimation(bubbleAnimation, 12, "upSpout");
+		bubbleAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
+		Animate *bubbleAnimate = Animate::create(bubbleAnimation);
+		auto delayTime = DelayTime::create(0.01f);
+		auto action = Sequence::create(bubbleAnimate, delayTime,
+			CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
+		bubble->runAction(action);
+		return;
+	}
 	else {
+		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] + 40 * (power - 1)))) return;
 		Sprite * temp;
 		temp = Sprite::createWithSpriteFrameName("up1.png");
 		temp->setPosition(Vec2(xVector[count-1], yVector[count-1] + 40 * (power - 1)));
@@ -209,10 +192,25 @@ void Bubble::up(int power) {
 	}
 }
 
-
 void Bubble::left(int power) {
-	if (power == 1) return;
+	if (power == 1) {
+		if (judgeBuilding(Vec2(xVector[count - 1] - 40 * h->bubblePower, yVector[count - 1]))) return;
+		Sprite *bubble;
+		bubble = Sprite::createWithSpriteFrameName("leftSpout1.png");
+		bubble->setPosition(Vec2(xVector[count - 1] - 40 * h->bubblePower, yVector[count - 1]));
+		this->addChild(bubble);
+		Animation *bubbleLeftAnimation = Animation::create();
+		innitAnimation(bubbleLeftAnimation, 12, "leftSpout");
+		bubbleLeftAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
+		Animate *bubbleAnimate = Animate::create(bubbleLeftAnimation);
+		auto delayTime = DelayTime::create(0.01f);
+		auto action = Sequence::create(bubbleAnimate, delayTime,
+			CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
+		bubble->runAction(action);
+		return;
+	}
 	else {
+		if (judgeBuilding(Vec2(xVector[count - 1] - 40 * (power - 1), yVector[count - 1]))) return;
 		Sprite * temp;
 		temp = Sprite::createWithSpriteFrameName("left1.png");
 		temp->setPosition(Vec2(xVector[count-1] - 40 * (power - 1), yVector[count-1]));
@@ -232,8 +230,24 @@ void Bubble::left(int power) {
 
 
 void Bubble::right(int power) {
-	if (power == 1) return;
+	if (power == 1) {
+		if (judgeBuilding(Vec2(xVector[count - 1] + 40 * h->bubblePower, yVector[count - 1]))) return;
+		Sprite * bubble;
+		bubble = Sprite::createWithSpriteFrameName("rightSpout1.png");
+		bubble->setPosition(Vec2(xVector[count - 1] + 40 * h->bubblePower, yVector[count - 1]));
+		this->addChild(bubble);
+		Animation *bubbleAnimation = Animation::create();
+		innitAnimation(bubbleAnimation, 12, "rightSpout");
+		bubbleAnimation->setDelayPerUnit(0.04f);//Á½Ö¡Ö®¼äÑÓ³Ù
+		Animate *bubbleAnimate = Animate::create(bubbleAnimation);
+		auto delayTime = DelayTime::create(0.01f);
+		auto action = Sequence::create(bubbleAnimate, delayTime,
+			CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bubble)), NULL);
+		bubble->runAction(action);
+		return;
+	}
 	else {
+		if (judgeBuilding(Vec2(xVector[count - 1] + 40 * (power - 1), yVector[count - 1]))) return;
 		Sprite * temp;
 		temp = Sprite::createWithSpriteFrameName("right1.png");
 		temp->setPosition(Vec2(xVector[count-1] +40 * (power - 1),yVector[count-1]));
