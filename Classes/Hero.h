@@ -23,23 +23,15 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* numLayer;
 public:
 	
-<<<<<<< HEAD
 	void judgeOnProps(const cocos2d::Vec2 pos);
 	Hero(int power = 1, int speed = 3, int number = 1);
 	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
-=======
-	Hero(int power = 2, int speed = 5, int number = 4);
-	int bubblePower, bubbleNumber, placeBubbleNumber;
-
->>>>>>> collision
 	static Hero* create(const std::string &filename);
 		
 	void setPosition(const cocos2d::Vec2 &position);
 	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);
 	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);
-
-	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 position);
 };
 
 #endif //__FIGHTER_SPRITE_H__

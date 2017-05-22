@@ -45,11 +45,7 @@ void Bubble::innitAnimation(Animation * ani, int n, const char s[]) {//³É¹¦ÓÅ»¯£
 
 Vec2 Bubble::tileCoordFromPosition(Vec2 position)//ÄÃµ½µÄÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖĞµÄ×ø±ê
 {
-<<<<<<< HEAD
 	int x = (position.x+10)/ oneTrainMap->getTileSize().width;
-=======
-	int x = (position.x - 20) / oneTrainMap->getTileSize().width + 1;
->>>>>>> collision
 	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y+40)
 		/ oneTrainMap->getTileSize().height+1;
 	return Vec2(x, y);
