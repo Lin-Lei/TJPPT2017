@@ -37,8 +37,13 @@ bool OneTrain::init(){
 	oneTrainMap->setAnchorPoint(Vec2(0.5, 0.5));
 	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-80, origin.y + visibleSize.height / 2));
 	addChild(oneTrainMap, 1);
+<<<<<<< HEAD
 	
 	building = oneTrainMap->getLayer("building");
+=======
+
+	collidable = oneTrainMap->getLayer("building");//´´½¨Åö×²²ã
+>>>>>>> collision
 	
 	//·µ»ØÍ¼Æ¬²Ëµ¥
 	auto returnItem = MenuItemImage::create(
