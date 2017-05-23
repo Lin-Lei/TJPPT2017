@@ -16,6 +16,7 @@ class Bubble : public cocos2d::Sprite
 	void left(int power);
 	void right(int power);
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
+	Hero* owner;
 
 public:
 	bool judgeBuilding(cocos2d::Vec2 pos);
@@ -26,6 +27,7 @@ public:
 	void placeBubble(cocos2d::Vec2 pos,Hero* hero);
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
 	cocos2d::Vec2 getPlacePosition(cocos2d::Vec2 pos);
+
 };
 
 #endif //__FIGHTER_SPRITE_H__

@@ -21,6 +21,8 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* shoseLayer;
 	cocos2d::TMXLayer* powerLayer;
 	cocos2d::TMXLayer* numLayer;
+
+
 public:
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
@@ -32,8 +34,9 @@ public:
 	static Hero* create(const std::string &filename);
 		
 	void setPosition(const cocos2d::Vec2 &position);
-	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);
-	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);
+	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);//”√”⁄“∆∂Ø”¢–€
+	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);//”¢–€æ≤÷π ±÷ÿ÷√ÕºœÒ
+
 };
 
 #endif //__FIGHTER_SPRITE_H__

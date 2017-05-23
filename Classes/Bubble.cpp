@@ -4,7 +4,6 @@ USING_NS_CC;
 
 std::vector<float>xVector;//¼ÇÂ¼Ã¿´Î·ÅÅÚµÄÎ»ÖÃ
 std::vector<float>yVector;//Õâ»áµ¼ÖÂ£¬vectorÔö³¤
-Hero *h;//ÔÚ×îºó½øÐÐ·ÅÅÚÊý¼õÐ¡²Ù×÷¡£ÒÅÁô¶àÈËÎï·ÅÅÚÊ±¿ÉÄÜ³öÏÖbug
 int count = 0;
 
 Bubble* Bubble::create(const std::string& spriteFrameName)
@@ -29,9 +28,9 @@ void Bubble::setPointer(TMXLayer* Building,TMXTiledMap* Map) {
 
 Vec2 Bubble::getPlacePosition(Vec2 position) {//µÃµ½ÈËÎï×ø±ê£¬Êä³öÅÝÅÝ×ø±ê
 	Vec2 post = tileCoordFromPosition(position);
-	float x= (post.x - 1)*map->getTileSize().width + map->getTileSize().width / 2 + 47;
-	float y= (map->getMapSize().height - post.y)*map->getTileSize().height +
-		map->getTileSize().height + 40;
+	float x= post.x*map->getTileSize().width + map->getTileSize().width / 2 + 20 + this->getContentSize().width/2;
+	float y= (map->getMapSize().height - post.y -1)*map->getTileSize().height +
+		map->getTileSize().height/2 + 40 + this->getContentSize().height / 2;
 	return Vec2(x, y);
 }
 
@@ -47,9 +46,9 @@ void Bubble::innitAnimation(Animation * ani, int n, const char s[]) {//³É¹¦ÓÅ»¯£
 
 bool Bubble::judgeBuilding(Vec2 pos) {
 	Vec2 tileCoord = tileCoordFromPosition(pos);
-	int tileGid = building->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	int tileGid = building->getTileGIDAt(tileCoord);
 	if (tileGid) {//Èç¹ûÓöµ½¿É±»Õ¨»ÙµÄ½¨ÖþÎï
-		building->removeTileAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+		building->removeTileAt(tileCoord);
 		return true;
 	}
 	return false;
@@ -57,9 +56,9 @@ bool Bubble::judgeBuilding(Vec2 pos) {
 
 Vec2 Bubble::tileCoordFromPosition(Vec2 position)//ÄÃµ½µÄÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖÐµÄ×ø±ê
 {
-	int x = (position.x+10)/ map->getTileSize().width;
-	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y+40)
-		/ map->getTileSize().height+1;
+	int x = (position.x - 20) / map->getTileSize().width;
+	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y + 40)
+		/ map->getTileSize().height;
 	return Vec2(x, y);
 }
 
@@ -67,7 +66,7 @@ Vec2 Bubble::tileCoordFromPosition(Vec2 position)//ÄÃµ½µÄÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖÐµÄ×ø±
 void Bubble::placeBubble(Vec2 p,Hero * hero) {//µÃµ½µÄ×ø±êÊÇÈËÎï×ø±ê
 	if (hero->bubbleNumber == hero->placeBubbleNumber) return;
 	else {
-		h = hero;
+		owner = hero;
 		hero->placeBubbleNumber++;
 		Sprite *bubble;
 		bubble = Sprite::createWithSpriteFrameName("bubble1.png");
@@ -76,7 +75,7 @@ void Bubble::placeBubble(Vec2 p,Hero * hero) {//µÃµ½µÄ×ø±êÊÇÈËÎï×ø±ê
 		Vec2 position = getPlacePosition(p);
 		xVector.push_back(position.x);
 		yVector.push_back(position.y);
-		bubble->setPosition(Vec2(position.x,position.y));//Õâ¸öÎ»ÖÃºÍ³õÊÔÅÝÅÝµÄÎ»ÖÃÓÐ¹Ø
+		bubble->setPosition(position);//Õâ¸öÎ»ÖÃºÍ³õÊÔÅÝÅÝµÄÎ»ÖÃÓÐ¹Ø
 		this->addChild(bubble);
 		
 		Animation *bubbleAnimation = Animation::create();//ÉèÖÃ³õÊÔÅÝÅÝÌø¶¯¶¯»­
@@ -118,11 +117,11 @@ void Bubble::bubbleBoom(int power) {
 
 void Bubble::down(int power) {
 	if (power == 1) {
-		h->placeBubbleNumber--;//¶¯×÷Íê³Éºó£¬·ÅÅÚÊý-1
-		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] - 40 * h->bubblePower))) return;
+		owner->placeBubbleNumber--;//¶¯×÷Íê³Éºó£¬·ÅÅÚÊý-1
+		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] - 40 * owner->bubblePower))) return;
 		Sprite * bubble;
 		bubble = Sprite::createWithSpriteFrameName("downSpout1.png");
-		bubble->setPosition(Vec2(xVector[count - 1], yVector[count - 1] - 40 * h->bubblePower));
+		bubble->setPosition(Vec2(xVector[count - 1], yVector[count - 1] - 40 * owner->bubblePower));
 		this->addChild(bubble);
 		Animation *bubbleAnimation = Animation::create();
 		innitAnimation(bubbleAnimation, 12, "downSpout");
@@ -136,7 +135,7 @@ void Bubble::down(int power) {
 	}
 	else {
 		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] - 40 * (power - 1)))) {
-			h->placeBubbleNumber--;
+			owner->placeBubbleNumber--;
 			return;
 		}
 		Sprite * temp;
@@ -158,10 +157,10 @@ void Bubble::down(int power) {
 
 void Bubble::up(int power) {
 	if (power == 1) {
-		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] + 40 * h->bubblePower))) return;
+		if (judgeBuilding(Vec2(xVector[count - 1], yVector[count - 1] + 40 * owner->bubblePower))) return;
 		Sprite * bubble;
 		bubble = Sprite::createWithSpriteFrameName("upSpout1.png");
-		bubble->setPosition(Vec2(xVector[count - 1], yVector[count - 1] + 40 * h->bubblePower));
+		bubble->setPosition(Vec2(xVector[count - 1], yVector[count - 1] + 40 * owner->bubblePower));
 		this->addChild(bubble);
 		Animation *bubbleAnimation = Animation::create();
 		innitAnimation(bubbleAnimation, 12, "upSpout");
@@ -194,10 +193,10 @@ void Bubble::up(int power) {
 
 void Bubble::left(int power) {
 	if (power == 1) {
-		if (judgeBuilding(Vec2(xVector[count - 1] - 40 * h->bubblePower, yVector[count - 1]))) return;
+		if (judgeBuilding(Vec2(xVector[count - 1] - 40 * owner->bubblePower, yVector[count - 1]))) return;
 		Sprite *bubble;
 		bubble = Sprite::createWithSpriteFrameName("leftSpout1.png");
-		bubble->setPosition(Vec2(xVector[count - 1] - 40 * h->bubblePower, yVector[count - 1]));
+		bubble->setPosition(Vec2(xVector[count - 1] - 40 * owner->bubblePower, yVector[count - 1]));
 		this->addChild(bubble);
 		Animation *bubbleLeftAnimation = Animation::create();
 		innitAnimation(bubbleLeftAnimation, 12, "leftSpout");
@@ -231,10 +230,10 @@ void Bubble::left(int power) {
 
 void Bubble::right(int power) {
 	if (power == 1) {
-		if (judgeBuilding(Vec2(xVector[count - 1] + 40 * h->bubblePower, yVector[count - 1]))) return;
+		if (judgeBuilding(Vec2(xVector[count - 1] + 40 * owner->bubblePower, yVector[count - 1]))) return;
 		Sprite * bubble;
 		bubble = Sprite::createWithSpriteFrameName("rightSpout1.png");
-		bubble->setPosition(Vec2(xVector[count - 1] + 40 * h->bubblePower, yVector[count - 1]));
+		bubble->setPosition(Vec2(xVector[count - 1] + 40 * owner->bubblePower, yVector[count - 1]));
 		this->addChild(bubble);
 		Animation *bubbleAnimation = Animation::create();
 		innitAnimation(bubbleAnimation, 12, "rightSpout");

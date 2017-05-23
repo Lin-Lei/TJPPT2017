@@ -5,9 +5,9 @@ USING_NS_CC;
 
 Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,输出瓦片坐标
 {
-	int x = (position.x + 10) / map->getTileSize().width;
+	int x = (position.x - 20) / map->getTileSize().width;
 	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y + 40)
-		/ map->getTileSize().height +1;
+		/ map->getTileSize().height;
 	return Vec2(x, y);
 }
 
@@ -80,6 +80,16 @@ void Hero::setPosition(const Vec2 &position)
 void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 {
 	Vec2 position = this->getPosition();
+
+	Vec2 collisionPos1 = position; //允许1像素的优化
+	Vec2 collisionPos2 = position;
+	Vec2 tileCoord1;
+	Vec2 tileCoord2;
+	int tileGid1;
+	int tileGid2;
+
+
+
 	switch (keyCode)
 	{
 	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
@@ -97,6 +107,20 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			moveLeftAnimation->setDelayPerUnit(0.1f);
 			Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 			runAction(RepeatForever::create(moveLeftAnimate));
+		}
+
+		collisionPos1.x = position.x - map->getTileSize().width / 2;
+		collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height-2;
+		collisionPos2.x = position.x - map->getTileSize().width / 2;
+		collisionPos2.y = position.y - this->getContentSize().height*0.1+2;
+		tileCoord1 = tileCoordFromPosition(collisionPos1);
+		tileCoord2 = tileCoordFromPosition(collisionPos2);
+		tileGid1 = building->getTileGIDAt(tileCoord1);
+		tileGid2 = building->getTileGIDAt(tileCoord2);
+
+		if (tileGid1 || tileGid2) 
+		{
+			position = this->getPosition();
 		}
 		break;
 		
@@ -117,6 +141,20 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			Animate *moveRightAnimate = Animate::create(moveRightAnimation);
 			runAction(RepeatForever::create(moveRightAnimate));
 		}
+
+		collisionPos1.x = position.x + map->getTileSize().width / 2;
+		collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height-2;
+		collisionPos2.x = position.x + map->getTileSize().width / 2;
+		collisionPos2.y = position.y - this->getContentSize().height*0.1+2;
+		tileCoord1 = tileCoordFromPosition(collisionPos1);
+		tileCoord2 = tileCoordFromPosition(collisionPos2);
+		tileGid1 = building->getTileGIDAt(tileCoord1);
+		tileGid2 = building->getTileGIDAt(tileCoord2);
+
+		if (tileGid1 || tileGid2)
+		{
+			position = this->getPosition();
+		}
 		break;
 		
 	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
@@ -134,6 +172,20 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			moveDownAnimation->setDelayPerUnit(0.1f);
 			Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 			runAction(RepeatForever::create(moveDownAnimate));
+		}
+
+		collisionPos1.x = position.x + map->getTileSize().width / 2-2;
+		collisionPos1.y = position.y - this->getContentSize().height*0.1;
+		collisionPos2.x = position.x - map->getTileSize().width / 2+2;
+		collisionPos2.y = position.y - this->getContentSize().height*0.1;
+		tileCoord1 = tileCoordFromPosition(collisionPos1);
+		tileCoord2 = tileCoordFromPosition(collisionPos2);
+		tileGid1 = building->getTileGIDAt(tileCoord1);
+		tileGid2 = building->getTileGIDAt(tileCoord2);
+
+		if (tileGid1 || tileGid2)
+		{
+			position = this->getPosition();
 		}
 		break;
 		
@@ -154,19 +206,24 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			Animate *moveUpAnimate = Animate::create(moveUpAnimation);
 			runAction(RepeatForever::create(moveUpAnimate));
 		}
+
+		collisionPos1.x = position.x + map->getTileSize().width / 2-2;
+		collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+		collisionPos2.x = position.x - map->getTileSize().width / 2+2;
+		collisionPos2.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+		tileCoord1 = tileCoordFromPosition(collisionPos1);
+		tileCoord2 = tileCoordFromPosition(collisionPos2);
+		tileGid1 = building->getTileGIDAt(tileCoord1);
+		tileGid2 = building->getTileGIDAt(tileCoord2);
+
+		if (tileGid1 || tileGid2)
+		{
+			position = this->getPosition();
+		}
 		break;
 
 	default:
 		break;
-	}
-
-
-	//从像素点坐标转化为瓦片坐标
-	Vec2 tileCoord = tileCoordFromPosition(position);
-	//获得瓦片的GID
-	int tileGid = building->getTileGIDAt(Vec2(tileCoord.x-1,tileCoord.y-1));
-	if (tileGid > 0) {
-		position = this->getPosition();
 	}
 
 
@@ -212,23 +269,23 @@ void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 
 void Hero::judgeOnProps(const Vec2 pos) {
 	Vec2 tileCoord = tileCoordFromPosition(pos);
-	int tileGid= powerLayer->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	int tileGid= powerLayer->getTileGIDAt(tileCoord);
 	if (tileGid) {
 		bubblePower++;
-		powerLayer->removeTileAt(Vec2(tileCoord.x-1,tileCoord.y-1));
+		powerLayer->removeTileAt(tileCoord);
 	}
 
-	tileGid = numLayer->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	tileGid = numLayer->getTileGIDAt(tileCoord);
 
 	if (tileGid) {
 		bubbleNumber++;
-		numLayer->removeTileAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+		numLayer->removeTileAt(tileCoord);
 	}
 
-	tileGid = shoseLayer->getTileGIDAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+	tileGid = shoseLayer->getTileGIDAt(tileCoord);
 
 	if (tileGid) {
 		movingSpeed++;
-		shoseLayer->removeTileAt(Vec2(tileCoord.x - 1, tileCoord.y - 1));
+		shoseLayer->removeTileAt(tileCoord);
 	}
 }
