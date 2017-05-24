@@ -267,6 +267,7 @@ void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 	}
 }
 
+//判断道具，并进行属性更改
 void Hero::judgeOnProps(const Vec2 pos) {
 	Vec2 tileCoord = tileCoordFromPosition(pos);
 	int tileGid= powerLayer->getTileGIDAt(tileCoord);

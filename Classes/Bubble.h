@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include"Hero.h"
+#include"vector"
+#include"queue"
 
 class Bubble : public cocos2d::Sprite
 {
@@ -17,8 +19,16 @@ class Bubble : public cocos2d::Sprite
 	void right(int power);
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 	Hero* owner;
+	int bubblePower;
+	bool firstEnter;
+	std::queue<float>xQueue;//记录每次放炮的像素位置
+	std::queue<float>yQueue;
+
+	std::vector<int>xVector;//记录所有尚未爆炸的泡泡的瓦片地图位置
+	std::vector<int>yVector;//用来控制一个泡泡炸到另一个泡泡
 
 public:
+	void eraseFront();
 	bool judgeBuilding(cocos2d::Vec2 pos);
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
