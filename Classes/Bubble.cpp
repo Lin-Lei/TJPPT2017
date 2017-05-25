@@ -23,11 +23,11 @@ void Bubble::setPointer(TMXLayer* Building,TMXTiledMap* Map) {//±ê¼ÇÈËÎïËùÔÚ³¡¾°
 	map = Map;
 }
 
-Vec2 Bubble::tileCoordFromPosition(Vec2 position)//ÄÃµ½µÄÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖÐµÄ×ø±ê
+Vec2 Bubble::tileCoordFromPosition(Vec2 position)//²ÎÊýÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖÐµÄ×ø±ê,µÃµ½ÈËÎïÃªµãËùÔÚµÄÍßÆ¬×ø±ê
 {
-	int x = (position.x - 20) / map->getTileSize().width;
-	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y + 40)
-		/ map->getTileSize().height;
+	int x = (position.x - 20) / map->getTileSize().width;//ÕýÈ·Âð£¿
+	int y = (map->getMapSize().height*map->getTileSize().height - position.y + 40)
+		/ map->getTileSize().height;	//Ã»ÓÐ¿¼ÂÇÃªµã
 	return Vec2(x, y);
 }
 
@@ -45,9 +45,9 @@ Vec2 Bubble::getPlacePosition(Vec2 position) {//µÃµ½ÈËÎï×ø±ê£¬Êä³öÅÝÅÝ×ø±ê
 	Vec2 post = tileCoordFromPosition(position);
 	xVector.push_back(post.x);
 	yVector.push_back(post.y);
-	float x= post.x*map->getTileSize().width + map->getTileSize().width / 2 + 20 + this->getContentSize().width/2;
-	float y= (map->getMapSize().height - post.y -1)*map->getTileSize().height +
-		map->getTileSize().height/2 + 40 + this->getContentSize().height / 2;
+	float x = post.x*map->getTileSize().width + map->getTileSize().width / 2 + 20 + this->getContentSize().width / 2;
+	float y= (map->getMapSize().height - post.y -1)*map->getTileSize().height +//ÎªÊ²Ã´£¿
+		map->getTileSize().height/2 + 40 + this->getContentSize().height / 2-1;
 	return Vec2(x, y);
 }
 
@@ -65,9 +65,10 @@ void Bubble::innitAnimation(Animation * ani, int n, const char s[]) {//³É¹¦ÓÅ»¯£
 //ÅÐ¶Ï½¨ÖþÎï£¬²¢½øÐÐÏû³ý¡£Í¬Ê±ÅÐ¶ÏÊÇ·ñ³öÁËÍßÆ¬µØÍ¼
 bool Bubble::judgeBuilding(Vec2 pos) {
 	Vec2 tileCoord = tileCoordFromPosition(pos);
-	--tileCoord.x;
-	++tileCoord.y;
-	if (tileCoord.x<=0||tileCoord.y<=0||tileCoord.x>15||tileCoord.y>15) return true;
+	--tileCoord.x;//ÎªÊ²Ã´£¿
+	int x = tileCoord.x;
+	int y = tileCoord.y;
+	if (x<0||y<0||x>=15||y>=13) return true;//»¹ÓÐÎÊÌâ
 	int tileGid = building->getTileGIDAt(tileCoord);
 	if (tileGid) {//Èç¹ûÓöµ½¿É±»Õ¨»ÙµÄ½¨ÖþÎï
 		building->removeTileAt(tileCoord);
