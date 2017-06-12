@@ -21,17 +21,19 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* shoseLayer;
 	cocos2d::TMXLayer* powerLayer;
 	cocos2d::TMXLayer* numLayer;
-
+	int playerNo;
 
 public:
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
 	void setPointer(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	void judgeOnProps(const cocos2d::Vec2 pos);
-	Hero(int power = 1, int speed = 3, int number = 1);
+
 	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;
+	Hero(int playerNo = 1, int power = 1, int speed = 3, int number = 1);
+
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
-	static Hero* create(const std::string &filename);
+	static Hero* create(const std::string &filename, int playerNo = 1);
 		
 	void setPosition(const cocos2d::Vec2 &position);
 	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);//用于移动英雄

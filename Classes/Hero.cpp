@@ -20,8 +20,9 @@ void Hero::setPointer(TMXLayer* Building,TMXTiledMap* Map) {
 }
 
 
-Hero::Hero(int power, int speed, int number)
+Hero::Hero(int playerNo, int power, int speed, int number)
 {
+	this->playerNo = playerNo;
 	bubblePower = power;
 	movingSpeed=speed;
 	bubbleNumber = number;
@@ -31,9 +32,9 @@ Hero::Hero(int power, int speed, int number)
 }
 
 //创建人物
-Hero* Hero::create(const std::string& spriteFrameName)
+Hero* Hero::create(const std::string& spriteFrameName, int playerNo)
 {
-	Hero *hero = new Hero();
+	Hero *hero = new Hero(playerNo);
 
 	if (hero && hero->initWithSpriteFrameName(spriteFrameName)) {
 		hero->autorelease();
@@ -89,182 +90,368 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	int tileGid2;
 
 
-
-	switch (keyCode)
+	if (playerNo == 1)
 	{
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		position.x -= movingSpeed;
-		judgeOnProps(position);
-		if (!animationPlaying)
+		switch (keyCode)
 		{
-			Animation *moveLeftAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+			position.x -= movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
 			{
-				__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveLeftAnimation->addSpriteFrame(spriteFrame);
+				Animation *moveLeftAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveLeftAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveLeftAnimation->setDelayPerUnit(0.1f);
+				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
+				runAction(RepeatForever::create(moveLeftAnimate));
 			}
-			moveLeftAnimation->setDelayPerUnit(0.1f);
-			Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
-			runAction(RepeatForever::create(moveLeftAnimate));
-		}
 
-		collisionPos1.x = position.x - map->getTileSize().width / 2;
-		collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height-2;
-		collisionPos2.x = position.x - map->getTileSize().width / 2;
-		collisionPos2.y = position.y - this->getContentSize().height*0.1+2;
-		tileCoord1 = tileCoordFromPosition(collisionPos1);
-		tileCoord2 = tileCoordFromPosition(collisionPos2);
-		tileGid1 = building->getTileGIDAt(tileCoord1);
-		tileGid2 = building->getTileGIDAt(tileCoord2);
+			collisionPos1.x = position.x - map->getTileSize().width / 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
+			collisionPos2.x = position.x - map->getTileSize().width / 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-		if (tileGid1 || tileGid2) 
-		{
-			position = this->getPosition();
-		}
-		break;
-		
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		
-		position.x += movingSpeed;
-		judgeOnProps(position);
-		if (!animationPlaying)
-		{
-			Animation *moveRightAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
+			if (tileGid1 || tileGid2)
 			{
-				__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveRightAnimation->addSpriteFrame(spriteFrame);
+				position = this->getPosition();
 			}
-			moveRightAnimation->setDelayPerUnit(0.1f);
-			Animate *moveRightAnimate = Animate::create(moveRightAnimation);
-			runAction(RepeatForever::create(moveRightAnimate));
-		}
+			break;
 
-		collisionPos1.x = position.x + map->getTileSize().width / 2;
-		collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height-2;
-		collisionPos2.x = position.x + map->getTileSize().width / 2;
-		collisionPos2.y = position.y - this->getContentSize().height*0.1+2;
-		tileCoord1 = tileCoordFromPosition(collisionPos1);
-		tileCoord2 = tileCoordFromPosition(collisionPos2);
-		tileGid1 = building->getTileGIDAt(tileCoord1);
-		tileGid2 = building->getTileGIDAt(tileCoord2);
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 
-		if (tileGid1 || tileGid2)
-		{
-			position = this->getPosition();
-		}
-		break;
-		
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		position.y -= movingSpeed;
-		judgeOnProps(position);
-		if (!animationPlaying)
-		{
-			Animation *moveDownAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
+			position.x += movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
 			{
-				__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveDownAnimation->addSpriteFrame(spriteFrame);
+				Animation *moveRightAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveRightAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveRightAnimation->setDelayPerUnit(0.1f);
+				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
+				runAction(RepeatForever::create(moveRightAnimate));
 			}
-			moveDownAnimation->setDelayPerUnit(0.1f);
-			Animate *moveDownAnimate = Animate::create(moveDownAnimation);
-			runAction(RepeatForever::create(moveDownAnimate));
-		}
 
-		collisionPos1.x = position.x + map->getTileSize().width / 2-2;
-		collisionPos1.y = position.y - this->getContentSize().height*0.1;
-		collisionPos2.x = position.x - map->getTileSize().width / 2+2;
-		collisionPos2.y = position.y - this->getContentSize().height*0.1;
-		tileCoord1 = tileCoordFromPosition(collisionPos1);
-		tileCoord2 = tileCoordFromPosition(collisionPos2);
-		tileGid1 = building->getTileGIDAt(tileCoord1);
-		tileGid2 = building->getTileGIDAt(tileCoord2);
+			collisionPos1.x = position.x + map->getTileSize().width / 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
+			collisionPos2.x = position.x + map->getTileSize().width / 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-		if (tileGid1 || tileGid2)
-		{
-			position = this->getPosition();
-		}
-		break;
-		
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		position.y += movingSpeed;
-		judgeOnProps(position);
-		if (!animationPlaying)
-		{
-			Animation *moveUpAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
+			if (tileGid1 || tileGid2)
 			{
-				__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveUpAnimation->addSpriteFrame(spriteFrame);
+				position = this->getPosition();
 			}
-			moveUpAnimation->setDelayPerUnit(0.1f);
-			moveUpAnimation->setRestoreOriginalFrame(true);
-			Animate *moveUpAnimate = Animate::create(moveUpAnimation);
-			runAction(RepeatForever::create(moveUpAnimate));
+			break;
+
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+			position.y -= movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
+			{
+				Animation *moveDownAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveDownAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveDownAnimation->setDelayPerUnit(0.1f);
+				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
+				runAction(RepeatForever::create(moveDownAnimate));
+			}
+
+			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1;
+			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				position = this->getPosition();
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+			position.y += movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
+			{
+				Animation *moveUpAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveUpAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveUpAnimation->setDelayPerUnit(0.1f);
+				moveUpAnimation->setRestoreOriginalFrame(true);
+				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
+				runAction(RepeatForever::create(moveUpAnimate));
+			}
+
+			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				position = this->getPosition();
+			}
+			break;
+
+		default:
+			break;
 		}
 
-		collisionPos1.x = position.x + map->getTileSize().width / 2-2;
-		collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
-		collisionPos2.x = position.x - map->getTileSize().width / 2+2;
-		collisionPos2.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
-		tileCoord1 = tileCoordFromPosition(collisionPos1);
-		tileCoord2 = tileCoordFromPosition(collisionPos2);
-		tileGid1 = building->getTileGIDAt(tileCoord1);
-		tileGid2 = building->getTileGIDAt(tileCoord2);
 
-		if (tileGid1 || tileGid2)
-		{
-			position = this->getPosition();
-		}
-		break;
-
-	default:
-		break;
+		this->setPosition(position);
 	}
 
+	else if (playerNo == 2)//wsad控制移动
+	{
+		switch (keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_A:
+			position.x -= movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
+			{
+				Animation *moveLeftAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveLeftAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveLeftAnimation->setDelayPerUnit(0.1f);
+				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
+				runAction(RepeatForever::create(moveLeftAnimate));
+			}
 
-	this->setPosition(position);
+			collisionPos1.x = position.x - map->getTileSize().width / 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
+			collisionPos2.x = position.x - map->getTileSize().width / 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				position = this->getPosition();
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_D:
+
+			position.x += movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
+			{
+				Animation *moveRightAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveRightAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveRightAnimation->setDelayPerUnit(0.1f);
+				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
+				runAction(RepeatForever::create(moveRightAnimate));
+			}
+
+			collisionPos1.x = position.x + map->getTileSize().width / 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
+			collisionPos2.x = position.x + map->getTileSize().width / 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				position = this->getPosition();
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_S:
+			position.y -= movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
+			{
+				Animation *moveDownAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveDownAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveDownAnimation->setDelayPerUnit(0.1f);
+				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
+				runAction(RepeatForever::create(moveDownAnimate));
+			}
+
+			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1;
+			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				position = this->getPosition();
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_W:
+			position.y += movingSpeed;
+			judgeOnProps(position);
+			if (!animationPlaying)
+			{
+				Animation *moveUpAnimation = Animation::create();
+				for (int i = 1; i <= 4; i++)
+				{
+					__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
+					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
+					moveUpAnimation->addSpriteFrame(spriteFrame);
+				}
+				moveUpAnimation->setDelayPerUnit(0.1f);
+				moveUpAnimation->setRestoreOriginalFrame(true);
+				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
+				runAction(RepeatForever::create(moveUpAnimate));
+			}
+
+			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
+			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
+			collisionPos2.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				position = this->getPosition();
+			}
+			break;
+
+		default:
+			break;
+		}
+
+
+		this->setPosition(position);
+	}
+	
 }
 
 void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 {
-	switch (keyCode)
+	if (playerNo == 1)
 	{
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-	{
-		SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Left.png");
-		setSpriteFrame(hero1Left);
-	}
+		switch (keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+		{
+			SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Left.png");
+			setSpriteFrame(hero1Left);
+		}
 		break;
 
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-	{
-		SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Right.png");
-		setSpriteFrame(hero1Right);
-	}
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+		{
+			SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Right.png");
+			setSpriteFrame(hero1Right);
+		}
 		break;
 
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-	{
-		SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Down.png");
-		setSpriteFrame(hero1Down);
-	}
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+		{
+			SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Down.png");
+			setSpriteFrame(hero1Down);
+		}
 		break;
 
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-	{
-		SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Up.png");
-		setSpriteFrame(hero1Up);
-	}
+		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+		{
+			SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Up.png");
+			setSpriteFrame(hero1Up);
+		}
 		break;
 
-	default:
-		break;
+		default:
+			break;
+		}
 	}
+	
+	else if (playerNo == 2)
+	{
+		switch (keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_A:
+		{
+			SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Left.png");
+			setSpriteFrame(hero1Left);
+		}
+		break;
+
+		case EventKeyboard::KeyCode::KEY_D:
+		{
+			SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Right.png");
+			setSpriteFrame(hero1Right);
+		}
+		break;
+
+		case EventKeyboard::KeyCode::KEY_S:
+		{
+			SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Down.png");
+			setSpriteFrame(hero1Down);
+		}
+		break;
+
+		case EventKeyboard::KeyCode::KEY_W:
+		{
+			SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Up.png");
+			setSpriteFrame(hero1Up);
+		}
+		break;
+
+		default:
+			break;
+		}
+	}
+
 }
 
 //判断道具，并进行属性更改

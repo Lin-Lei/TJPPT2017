@@ -55,19 +55,31 @@ bool DoubleBattle::init() {
 	bubble->setAnchorPoint(Vec2(0.5f, 0.5f));
 	bubble->setPosition(Vec2(origin.x, origin.y));
 	this->addChild(bubble, 9);
-	hero = Hero::create("hero1Down.png");
+
+	hero = Hero::create("hero1Down.png", 1);
 	hero->setPointer(building, doubleBattleMap);
 	bubble->setPointer(building, doubleBattleMap);
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
+	hero2 = Hero::create("hero1Down.png", 2);
+	hero2->setPointer(building, doubleBattleMap);
+	hero2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
+	this->addChild(hero2, 10, HERO_2);
+
+
 
 	//初始化Map容器
-	keyCodeMap = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
-	resetKeyCodeMap();
+	keyCodeMap1 = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
+	resetKeyCodeMap1();
+	keyCodeMap2 = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
+	resetKeyCodeMap2();
 
-	pressCnt = 0; //优化多按键时的判定
-	validPress = false;
+	pressCnt1 = 0; //优化多按键时的判定
+	validPress1 = false;
+
+	pressCnt2 = 0; //优化多按键时的判定
+	validPress2 = false;
 
 	//注册 键盘事件监听器
 	heroKeyboardListener = EventListenerKeyboard::create();
@@ -75,7 +87,7 @@ bool DoubleBattle::init() {
 	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_RIGHT_SHIFT) {
 			bubble->placeBubble(hero->getPosition(), hero);//完成放泡泡功能
 		}
 		if (hero->getAnimationPlaying())//正在做的动画停止
@@ -86,10 +98,27 @@ bool DoubleBattle::init() {
 
 		if (checkArrow(keyCode))
 		{
-			validPress = true;
-			pressCnt++;
-			onPressCode = keyCode;
-			keyCodeMap[keyCode] = true;
+			validPress1 = true;
+			pressCnt1++;
+			onPressCode1 = keyCode;
+			keyCodeMap1[keyCode] = true;
+		}
+
+		if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_SHIFT) {
+			bubble->placeBubble(hero2->getPosition(), hero);//完成放泡泡功能
+		}
+		if (hero2->getAnimationPlaying())//正在做的动画停止
+		{
+			hero2->stopAllActions();
+			hero2->setAnimationPlaying(false);
+		}
+
+		if (checkP2(keyCode))
+		{
+			validPress2 = true;
+			pressCnt2++;
+			onPressCode2 = keyCode;
+			keyCodeMap2[keyCode] = true;
 		}
 	};
 
@@ -98,31 +127,61 @@ bool DoubleBattle::init() {
 	{
 		if (checkArrow(keyCode))
 		{
-			pressCnt--;
-			keyCodeMap[keyCode] = false;
-			if (pressCnt == 1)
+			pressCnt1--;
+			keyCodeMap1[keyCode] = false;
+			if (pressCnt1 == 1)
 			{
-				validPress = true;
+				validPress1 = true;
 				hero->stopAllActions();
 				hero->setAnimationPlaying(false);
 				std::map<cocos2d::EventKeyboard::KeyCode, bool>::iterator it;
-				for (it = keyCodeMap.begin(); it != keyCodeMap.end(); it++)
+				for (it = keyCodeMap1.begin(); it != keyCodeMap1.end(); it++)
 				{
 					if (it->second)
 					{
-						onPressCode = it->first;
+						onPressCode1 = it->first;
 					}
 				}
 			}
 			else
 			{
-				validPress = false;
+				validPress1 = false;
 				if (hero->getAnimationPlaying())
 				{
 					hero->stopAllActions();
 					hero->setAnimationPlaying(false);
 				}
 				hero->setFrame(keyCode);
+			}
+		}
+
+		if (checkP2(keyCode))
+		{
+			pressCnt2--;
+			keyCodeMap2[keyCode] = false;
+			if (pressCnt2 == 1)
+			{
+				validPress2 = true;
+				hero2->stopAllActions();
+				hero2->setAnimationPlaying(false);
+				std::map<cocos2d::EventKeyboard::KeyCode, bool>::iterator it;
+				for (it = keyCodeMap2.begin(); it != keyCodeMap2.end(); it++)
+				{
+					if (it->second)
+					{
+						onPressCode2 = it->first;
+					}
+				}
+			}
+			else
+			{
+				validPress2 = false;
+				if (hero2->getAnimationPlaying())
+				{
+					hero2->stopAllActions();
+					hero2->setAnimationPlaying(false);
+				}
+				hero2->setFrame(keyCode);
 			}
 		}
 
@@ -159,28 +218,51 @@ void DoubleBattle::menuReturnCallback(cocos2d::Ref* pSender) {
 void DoubleBattle::update(float dt)//每秒60次更新
 {
 
-	if (validPress)
+	if (validPress1)
 	{
-		hero->moveHero(onPressCode);
+		hero->moveHero(onPressCode1);
 		hero->setAnimationPlaying(true);
+	}
+
+	if (validPress2)
+	{
+		hero2->moveHero(onPressCode2);
+		hero2->setAnimationPlaying(true);
 	}
 
 }
 
-void DoubleBattle::resetKeyCodeMap()
+void DoubleBattle::resetKeyCodeMap1()
 {
-	keyCodeMap[EventKeyboard::KeyCode::KEY_LEFT_ARROW] = false;
-	keyCodeMap[EventKeyboard::KeyCode::KEY_RIGHT_ARROW] = false;
-	keyCodeMap[EventKeyboard::KeyCode::KEY_DOWN_ARROW] = false;
-	keyCodeMap[EventKeyboard::KeyCode::KEY_UP_ARROW] = false;
+	keyCodeMap1[EventKeyboard::KeyCode::KEY_LEFT_ARROW] = false;
+	keyCodeMap1[EventKeyboard::KeyCode::KEY_RIGHT_ARROW] = false;
+	keyCodeMap1[EventKeyboard::KeyCode::KEY_DOWN_ARROW] = false;
+	keyCodeMap1[EventKeyboard::KeyCode::KEY_UP_ARROW] = false;
 
 }
 
-bool DoubleBattle::checkArrow(EventKeyboard::KeyCode keyCode)
+void DoubleBattle::resetKeyCodeMap2()
+{
+	keyCodeMap2[EventKeyboard::KeyCode::KEY_A] = false;
+	keyCodeMap2[EventKeyboard::KeyCode::KEY_D] = false;
+	keyCodeMap2[EventKeyboard::KeyCode::KEY_S] = false;
+	keyCodeMap2[EventKeyboard::KeyCode::KEY_W] = false;
+
+}
+
+bool DoubleBattle::checkArrow(EventKeyboard::KeyCode keyCode)//检测P1按键
 {
 	return (keyCode == EventKeyboard::KeyCode::KEY_LEFT_ARROW
 		|| keyCode == EventKeyboard::KeyCode::KEY_RIGHT_ARROW
 		|| keyCode == EventKeyboard::KeyCode::KEY_UP_ARROW
 		|| keyCode == EventKeyboard::KeyCode::KEY_DOWN_ARROW);
+}
+
+bool DoubleBattle::checkP2(EventKeyboard::KeyCode keyCode)//检测P2按键
+{
+	return (keyCode == EventKeyboard::KeyCode::KEY_A
+		|| keyCode == EventKeyboard::KeyCode::KEY_D
+		|| keyCode == EventKeyboard::KeyCode::KEY_W
+		|| keyCode == EventKeyboard::KeyCode::KEY_S);
 }
 
