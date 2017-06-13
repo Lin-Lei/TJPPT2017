@@ -87,7 +87,7 @@ bool DoubleBattle::init() {
 	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (keyCode == EventKeyboard::KeyCode::KEY_RIGHT_SHIFT) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER) {
 			bubble->placeBubble(hero->getPosition(), hero);//完成放泡泡功能
 		}
 		if (hero->getAnimationPlaying())//正在做的动画停止
@@ -104,8 +104,8 @@ bool DoubleBattle::init() {
 			keyCodeMap1[keyCode] = true;
 		}
 
-		if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_SHIFT) {
-			bubble->placeBubble(hero2->getPosition(), hero);//完成放泡泡功能
+		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE) {
+			bubble->placeBubble(hero2->getPosition(), hero2);//完成放泡泡功能
 		}
 		if (hero2->getAnimationPlaying())//正在做的动画停止
 		{

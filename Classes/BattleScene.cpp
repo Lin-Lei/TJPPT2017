@@ -41,14 +41,14 @@ bool Battle::init(){
 		"button/backnormal.jpg",
 		"button/backselect.jpg",
 		CC_CALLBACK_1(Battle::menuReturnCallBack, this));
-	returnMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 50));
+	returnMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 100));
 
 	//双人对战图片菜单
 	auto doubleBattleMenuItem = MenuItemImage::create(
 		"button/doublenormal.jpg",
 		"button/doubleselect.jpg",
 		CC_CALLBACK_1(Battle::menuDoubleBattleCallBack, this));
-	doubleBattleMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 100));
+	doubleBattleMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 -50));
 
 	Menu *mn = Menu::create(oneTrainMenuItem,returnMenuItem,doubleBattleMenuItem, NULL);
 	mn->setPosition(Vec2::ZERO);

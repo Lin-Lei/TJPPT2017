@@ -21,6 +21,7 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* shoseLayer;
 	cocos2d::TMXLayer* powerLayer;
 	cocos2d::TMXLayer* numLayer;
+	cocos2d::TMXLayer* propLayer;
 	int playerNo;
 
 public:

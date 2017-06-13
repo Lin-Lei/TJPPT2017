@@ -17,6 +17,7 @@ void Hero::setPointer(TMXLayer* Building,TMXTiledMap* Map) {
 	shoseLayer = map->getLayer("speed");
 	powerLayer = map->getLayer("bubblePower");
 	numLayer = map->getLayer("bubbleNum");
+	propLayer = map->getLayer("prop");
 }
 
 
@@ -457,23 +458,24 @@ void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 //判断道具，并进行属性更改
 void Hero::judgeOnProps(const Vec2 pos) {
 	Vec2 tileCoord = tileCoordFromPosition(pos);
-	int tileGid= powerLayer->getTileGIDAt(tileCoord);
+	int tileGid= propLayer->getTileGIDAt(tileCoord);
 	if (tileGid) {
-		bubblePower++;
-		powerLayer->removeTileAt(tileCoord);
-	}
-
-	tileGid = numLayer->getTileGIDAt(tileCoord);
-
-	if (tileGid) {
-		bubbleNumber++;
-		numLayer->removeTileAt(tileCoord);
-	}
-
-	tileGid = shoseLayer->getTileGIDAt(tileCoord);
-
-	if (tileGid) {
-		movingSpeed++;
-		shoseLayer->removeTileAt(tileCoord);
+		Value prop = map->getPropertiesForGID(tileGid);
+		ValueMap propValueMap = prop.asValueMap();
+		std::string speed = propValueMap["speed"].asString();
+		std::string number = propValueMap["number"].asString();
+		std::string power = propValueMap["power"].asString();
+		if (speed == "true") {
+			movingSpeed++;
+			propLayer->removeTileAt(tileCoord);
+		}
+		if (power == "true") {
+			bubblePower++;
+			propLayer->removeTileAt(tileCoord);
+		}
+		if (number == "true") {
+			bubbleNumber++;
+			propLayer->removeTileAt(tileCoord);
+		}
 	}
 }
