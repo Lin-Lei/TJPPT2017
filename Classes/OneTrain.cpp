@@ -56,8 +56,8 @@ bool OneTrain::init(){
 	bubble->setPosition(Vec2(origin.x , origin.y ));
 	this->addChild(bubble, 9);
 	hero = Hero::create("hero1Down.png");
-	hero->setPointer(building, oneTrainMap);
-	bubble->setPointer(building, oneTrainMap);
+	hero->setScene(building, oneTrainMap);
+	bubble->setScene(building, oneTrainMap);
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 

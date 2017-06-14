@@ -2,6 +2,16 @@
 
 USING_NS_CC;
 
+void Hero::innitAnimation(Animation * ani, int n, const char s[]) {//成功优化，美滋滋,大幅减小代码数量
+	for (int i = 1; i <= n; i++)
+	{
+		__String *FrameName = __String::createWithFormat("%s%d.png", s, i);
+		SpriteFrame *bubbleFrame =
+			SpriteFrameCache::getInstance()->getSpriteFrameByName(FrameName->getCString());
+		ani->addSpriteFrame(bubbleFrame);
+	}
+}
+
 
 Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,输出瓦片坐标
 {
@@ -11,7 +21,7 @@ Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,
 	return Vec2(x, y);
 }
 
-void Hero::setPointer(TMXLayer* Building,TMXTiledMap* Map) {
+void Hero::setScene(TMXLayer* Building,TMXTiledMap* Map) {
 	building = Building;
 	map = Map;
 	shoseLayer = map->getLayer("speed");
@@ -36,7 +46,6 @@ Hero::Hero(int playerNo, int power, int speed, int number)
 Hero* Hero::create(const std::string& spriteFrameName, int playerNo)
 {
 	Hero *hero = new Hero(playerNo);
-
 	if (hero && hero->initWithSpriteFrameName(spriteFrameName)) {
 		hero->autorelease();
 
@@ -101,12 +110,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveLeftAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveLeftAnimation, 4, "hero1Left");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveLeftAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveLeftAnimation->setDelayPerUnit(0.1f);
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
@@ -134,12 +144,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveRightAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveRightAnimation, 4, "hero1Right");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveRightAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveRightAnimation->setDelayPerUnit(0.1f);
 				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
 				runAction(RepeatForever::create(moveRightAnimate));
@@ -166,12 +177,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveDownAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveDownAnimation, 4, "hero1Down");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveDownAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveDownAnimation->setDelayPerUnit(0.1f);
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
@@ -198,12 +210,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveUpAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveUpAnimation, 4, "hero1Up");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveUpAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveUpAnimation->setDelayPerUnit(0.1f);
 				moveUpAnimation->setRestoreOriginalFrame(true);
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
@@ -243,12 +256,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveLeftAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveLeftAnimation, 4, "hero1Left");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveLeftAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveLeftAnimation->setDelayPerUnit(0.1f);
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
@@ -276,12 +290,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveRightAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveRightAnimation, 4, "hero1Right");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveRightAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveRightAnimation->setDelayPerUnit(0.1f);
 				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
 				runAction(RepeatForever::create(moveRightAnimate));
@@ -308,12 +323,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveDownAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveDownAnimation, 4, "hero1Down");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveDownAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveDownAnimation->setDelayPerUnit(0.1f);
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
@@ -340,12 +356,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveUpAnimation = Animation::create();
-				for (int i = 1; i <= 4; i++)
+				innitAnimation(moveUpAnimation, 4, "hero1Up");
+				/*for (int i = 1; i <= 4; i++)
 				{
 					__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
 					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
 					moveUpAnimation->addSpriteFrame(spriteFrame);
-				}
+				}*/
 				moveUpAnimation->setDelayPerUnit(0.1f);
 				moveUpAnimation->setRestoreOriginalFrame(true);
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);

@@ -28,14 +28,10 @@ public:
 class Bubble : public cocos2d::Sprite
 {
 	void bubbleBoom(Hero * hero);
-	void leftSpout(int power);
-	void rightSpout(int power);
-	void upSpout(int power);
-	void downSpout(int power);
-	void down(int power);
-	void up(int power);
-	void left(int power);
-	void right(int power);
+	void down(cocos2d::Vec2 pos);
+	void up(cocos2d::Vec2 pos);
+	void left(cocos2d::Vec2 pos);
+	void right(cocos2d::Vec2 pos);
 	std::list<bubbleInformation>bubbleInfo;
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
@@ -50,7 +46,7 @@ class Bubble : public cocos2d::Sprite
 
 public:
 	
-	void setPointer(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
+	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	static Bubble* create(const std::string &filename);
 	void placeBubble(cocos2d::Vec2 pos,Hero* hero);
 };

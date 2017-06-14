@@ -57,13 +57,13 @@ bool DoubleBattle::init() {
 	this->addChild(bubble, 9);
 
 	hero = Hero::create("hero1Down.png", 1);
-	hero->setPointer(building, doubleBattleMap);
-	bubble->setPointer(building, doubleBattleMap);
+	hero->setScene(building, doubleBattleMap);
+	bubble->setScene(building, doubleBattleMap);
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
 	hero2 = Hero::create("hero1Down.png", 2);
-	hero2->setPointer(building, doubleBattleMap);
+	hero2->setScene(building, doubleBattleMap);
 	hero2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero2, 10, HERO_2);
 

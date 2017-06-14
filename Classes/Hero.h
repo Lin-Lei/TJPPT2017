@@ -23,11 +23,12 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* numLayer;
 	cocos2d::TMXLayer* propLayer;
 	int playerNo;
+	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 public:
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
-	void setPointer(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
+	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	void judgeOnProps(const cocos2d::Vec2 pos);
 
 	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;
