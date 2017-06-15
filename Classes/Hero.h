@@ -17,24 +17,35 @@ typedef enum
 
 class Hero : public cocos2d::Sprite
 {
-	CC_SYNTHESIZE(int, bubblePower, BubblePower);
-	CC_SYNTHESIZE(int, movingSpeed, MovingSpeed);
-	CC_SYNTHESIZE(int, bubbleNumber, BubbleNumber);
-	CC_SYNTHESIZE(int, placedBubbleNum, PlacedBubbleNum);
 	CC_SYNTHESIZE(bool, animationPlaying, AnimationPlaying);
-
-	
+	cocos2d::TMXLayer* shoseLayer;
+	cocos2d::TMXLayer* powerLayer;
+	cocos2d::TMXLayer* numLayer;
+	cocos2d::TMXLayer* propLayer;
+	int playerNo;
+	cocos2d::Vec2 heroPosition;
+	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 public:
-	
-	Hero(int power = 1, int speed = 1, int number = 1);
+	bool trapped,die;
+	void toDie();
+	cocos2d::TMXLayer* building;
+	cocos2d::TMXTiledMap* map;
+	void win();
+	void becomeDie();
+	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
+	void judgeOnProps(const cocos2d::Vec2 pos);
 
-	static Hero* create(const std::string &filename);
+	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;
+	Hero(int playerNo = 1, int power = 1, int speed = 3, int number = 1);
 
+	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
+	static Hero* create(const std::string &filename, int playerNo = 1);
+		
 	void setPosition(const cocos2d::Vec2 &position);
-	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);
-	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);
-	void Hero::placeBubble(const cocos2d::Vec2 &position);
+	cocos2d::Vec2 getPosition();
+	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);//用于移动英雄
+	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);//英雄静止时重置图像
 
 };
 
