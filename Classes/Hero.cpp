@@ -84,7 +84,7 @@ void Hero::setPosition(const Vec2 &position)
 		pos_y = 560 - 34;
 	}
 
-
+	log("%f, %f", pos_x, pos_y);
 	heroPosition = Vec2(pos_x, pos_y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
@@ -127,7 +127,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x -= movingSpeed;
 			if (centerPos.x <= 20 + 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x - 20;
@@ -187,7 +187,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x += movingSpeed;
 			if (centerPos.x >= 620 - 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20;
@@ -245,7 +245,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y -= movingSpeed;
 			if (centerPos.y <= 40 + 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -303,7 +303,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y += movingSpeed;
 			if (centerPos.y >= 560 - 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -372,7 +372,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x -= movingSpeed;
 			if (centerPos.x <= 20 + 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x - 20;
@@ -432,7 +432,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x += movingSpeed;
 			if (centerPos.x >= 620 - 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20;
@@ -490,7 +490,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y -= movingSpeed;
 			if (centerPos.y <= 40 + 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -548,7 +548,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y += movingSpeed;
 			if (centerPos.y >= 560 - 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
