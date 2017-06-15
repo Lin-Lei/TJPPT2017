@@ -1,9 +1,9 @@
 #ifndef __Battle_SCENE_H__
 #define __Battle_SCENE_H__
 #include "cocos2d.h"
-#include"OneTrain.h"
+#include"OnePlayerExplain.h"
+#include"TwoPlayersExplain.h"
 #include"SimpleAudioEngine.h"
-#include"DoubleBattle.h"
 
 class Battle : public cocos2d::Layer{
 public:

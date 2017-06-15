@@ -31,6 +31,14 @@ Vec2 Bubble::tileCoordFromPosition(Vec2 position)//参数是人物在整个场景中的坐标,
 	return Vec2(x, y);
 }
 
+bool Bubble::judgeReBoom(Vec2 pos) {
+	Vec2 tilePos = tileCoordFromPosition(pos);
+	for (auto const &i : bubbleInfo) {
+		//log("sx=%d sy=%d,x=%f y=%f", i.tileX, i.tileY, tilePos.x-1, tilePos.y);
+		if (i.tileX == tilePos.x-1&&i.tileY == tilePos.y) return true;
+	}
+	return false;
+}
 
 void Bubble::resetPlaceBubbleNum(Hero *hero) {
 	hero->placeBubbleNumber--;
@@ -87,7 +95,7 @@ void Bubble::judgeBoomHero(Hero *hero,int x,int y,int power) {
 		if (abs(x - heroX) <= power) hero->becomeDie();
 	}
 }
-
+int c = 0;
 void Bubble::boomInSameTime() {
 	auto it = bubbleInfo.begin();
 	auto first = bubbleInfo.begin();
@@ -96,23 +104,27 @@ void Bubble::boomInSameTime() {
 	for (; it != bubbleInfo.end(); it++) {
 		judgeBoomHero(player1, x, y,it->power);
 		if(player2!=NULL) judgeBoomHero(player2, x, y, it->power);
-		if (it->tileX == x&&it->tileY == y) continue;//躲过第一个点和放在同一个位置的点
+		if (it->tileX == x&&it->tileY == y||it->judge) continue;//躲过第一个点和放在同一个位置的点
 		if (it->tileX == x) {
 			if (abs(it->tileY - y) <= first->power) {
+				auto temp = *first;
 				*first = *it;
+				it->tileX = temp.tileX;
+				it->tileY = temp.tileY;
+				it->judge = true;
 				it->bubble->removeFromParent();
 				bubbleBoom(it->hero);
-				it=bubbleInfo.erase(it);
-				--it;
 			}
 		}
 		else if (it->tileY == y) {//else本不该有。因为泡泡不该重叠
 			if (abs(it->tileX - x) <= first->power) {
-				*first=*it;
+				auto temp = *first;
+				*first = *it;
+				it->tileX = temp.tileX;
+				it->tileY = temp.tileY;
+				it->judge = true;
 				it->bubble->removeFromParent();
 				bubbleBoom(it->hero);
-				it = bubbleInfo.erase(it);
-				--it;
 			}
 		}
 	}
@@ -127,13 +139,16 @@ void Bubble::eraseFront() {
 void Bubble::placeBubble(Vec2 p, Hero * hero) {//得到的坐标是人物坐标
 	if (hero->bubbleNumber == hero->placeBubbleNumber||hero->trapped) return;
 	else {
-		hero->placeBubbleNumber++;
 		bubbleInformation bInfo;
+		Vec2 position = getPlacePosition(p, &bInfo);
+		for (const auto &i : bubbleInfo) {
+			if (i.tileX == bInfo.tileX&&i.tileY == bInfo.tileY) return;
+		}
 		Sprite *bubble;
 		bubble = Sprite::createWithSpriteFrameName("bubble1.png");
 		bubble->setAnchorPoint(Vec2(0.5f, 0.5f));
 
-		Vec2 position = getPlacePosition(p,&bInfo);
+		hero->placeBubbleNumber++;
 		bInfo.power = hero->bubblePower;
 		bInfo.hero = hero;
 		bubble->setPosition(position);//这个位置和初试泡泡的位置有关
@@ -155,10 +170,12 @@ void Bubble::placeBubble(Vec2 p, Hero * hero) {//得到的坐标是人物坐标
 }
 
 void Bubble::bubbleBoom(Hero* hero) {
+	c++;
 	hero->placeBubbleNumber--;
 	Sprite * bubble;
 	bubble = Sprite::createWithSpriteFrameName("bubbleCenter1.png");
-	bubble->setPosition(bubbleInfo.front().position);
+	//log("size=%d", bubbleInfo.size());
+	bubble->setPosition(bubbleInfo.front().position);//连着连环爆炸+单炸，这里会出bug
 	this->addChild(bubble);
 	Animation *bubbleCenterAnimation = Animation::create();
 	innitAnimation(bubbleCenterAnimation, 4, "bubbleCenter");
@@ -172,9 +189,8 @@ void Bubble::bubbleBoom(Hero* hero) {
 	auto boomAction = CallFunc::create(CC_CALLBACK_0(Bubble::boomInSameTime, this));
 	auto spawnAction = Spawn::create(bubbleCenterAnimate,downAction,upAction,
 		leftAction,rightAction,boomAction,NULL);
-	auto delayTime = DelayTime::create(0.001f);
-	auto action = Sequence::create(spawnAction,
-		delayTime, CallFunc::create(CC_CALLBACK_0(Bubble::eraseFront,this)),
+	auto delayTime = DelayTime::create(0.01f);
+	auto action = Sequence::create(spawnAction,delayTime, CallFunc::create(CC_CALLBACK_0(Bubble::eraseFront,this)),
 		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent,bubble)),NULL);
 	bubble->runAction(action);
 }
@@ -183,7 +199,7 @@ void Bubble::bubbleBoom(Hero* hero) {
 void Bubble::down(Vec2 pos) {
 	if (bubbleInfo.front().power > 1) {
 		for (int p = 1; p < bubbleInfo.front().power; p++) {
-			if (judgeBuilding(Vec2(pos.x, pos.y - 40 * p))) return;
+			if (judgeReBoom(Vec2(pos.x, pos.y - 40 * p))||judgeBuilding(Vec2(pos.x, pos.y - 40 * p))) return;
 			Sprite * temp;
 			temp = Sprite::createWithSpriteFrameName("down1.png");
 			temp->setPosition(Vec2(pos.x, pos.y - 40 * p));
@@ -217,7 +233,7 @@ void Bubble::down(Vec2 pos) {
 void Bubble::up(Vec2 pos) {
 	if (bubbleInfo.front().power > 1) {
 		for (int p = 1; p < bubbleInfo.front().power; p++) {
-			if (judgeBuilding(Vec2(pos.x, pos.y + 40 * p))) return;
+			if (judgeReBoom(Vec2(pos.x, pos.y + 40 * p))||judgeBuilding(Vec2(pos.x, pos.y + 40 * p))) return;
 			Sprite * temp;
 			temp = Sprite::createWithSpriteFrameName("up1.png");
 			temp->setPosition(Vec2(pos.x, pos.y + 40 * p));
@@ -251,7 +267,7 @@ void Bubble::up(Vec2 pos) {
 void Bubble::left(Vec2 pos) {
 	if (bubbleInfo.front().power > 1) {
 		for (int p = 1; p < bubbleInfo.front().power; p++) {
-			if (judgeBuilding(Vec2(pos.x - 40 * p, pos.y))) return;
+			if (judgeReBoom(Vec2(pos.x - 40 * p, pos.y))||judgeBuilding(Vec2(pos.x - 40 * p, pos.y))) return;
 			Sprite * temp;
 			temp = Sprite::createWithSpriteFrameName("left1.png");
 			temp->setPosition(Vec2(pos.x - 40 * p, pos.y));
@@ -285,7 +301,7 @@ void Bubble::left(Vec2 pos) {
 void Bubble::right(Vec2 pos) {
 	if (bubbleInfo.front().power > 1) {
 		for (int p = 1; p < bubbleInfo.front().power; p++) {
-			if (judgeBuilding(Vec2(pos.x + 40 * p, pos.y))) return;
+			if (judgeReBoom(Vec2(pos.x + 40 * p, pos.y))||judgeBuilding(Vec2(pos.x + 40 * p, pos.y))) return;
 			Sprite * temp;
 			temp = Sprite::createWithSpriteFrameName("right1.png");
 			temp->setPosition(Vec2(pos.x + 40 * p, pos.y));

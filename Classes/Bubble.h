@@ -10,7 +10,9 @@ public:
 	Hero* hero;
 	cocos2d::Vec2 position;//放置泡泡的像素坐标
 	int power, tileX, tileY;//泡泡的威力和瓦片坐标
+	bool judge;
 	bubbleInformation() {
+		judge = false;
 		bubble = NULL;
 		position = cocos2d::Vec2(0, 0);
 		power = tileX = tileY = 0;
@@ -32,13 +34,13 @@ class Bubble : public cocos2d::Sprite
 	void up(cocos2d::Vec2 pos);
 	void left(cocos2d::Vec2 pos);
 	void right(cocos2d::Vec2 pos);
-	std::list<bubbleInformation>bubbleInfo;
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 	void resetPlaceBubbleNum(Hero* hero);
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
 	cocos2d::Vec2 getPlacePosition(cocos2d::Vec2 pos,bubbleInformation *bInfo);
 	void eraseFront();
+	bool judgeReBoom(cocos2d::Vec2 pos);
 	bool judgeBuilding(cocos2d::Vec2 pos);
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
@@ -46,6 +48,7 @@ class Bubble : public cocos2d::Sprite
 	void judgeBoomHero(Hero* player,int x,int y,int power);
 
 public:
+	std::list<bubbleInformation>bubbleInfo;
 	Hero* player1,* player2;
 	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	static Bubble* create(const std::string &filename);

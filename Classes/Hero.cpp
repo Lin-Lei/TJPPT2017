@@ -65,6 +65,7 @@ Hero* Hero::create(const std::string& spriteFrameName, int playerNo)
 //设置位置
 void Hero::setPosition(const Vec2 &position)
 {
+	if (trapped) return;
 	Size screenSize = Director::getInstance()->getVisibleSize();
 
 	float pos_x = position.x;
@@ -83,8 +84,6 @@ void Hero::setPosition(const Vec2 &position)
 	else if (pos_y >560 - 34) {
 		pos_y = 560 - 34;
 	}
-
-
 	heroPosition = Vec2(pos_x, pos_y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
@@ -127,7 +126,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x -= movingSpeed;
 			if (centerPos.x <= 20 + 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x - 20;
@@ -187,7 +186,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x += movingSpeed;
 			if (centerPos.x >= 620 - 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20;
@@ -245,7 +244,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y -= movingSpeed;
 			if (centerPos.y <= 40 + 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -303,7 +302,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y += movingSpeed;
 			if (centerPos.y >= 560 - 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -372,7 +371,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x -= movingSpeed;
 			if (centerPos.x <= 20 + 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x - 20;
@@ -412,7 +411,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 					}
 				}
 				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
-
 			}
 			break;
 
@@ -432,7 +430,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.x += movingSpeed;
 			if (centerPos.x >= 620 - 20)
 			{
-				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20;
@@ -490,7 +488,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y -= movingSpeed;
 			if (centerPos.y <= 40 + 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 + 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -548,7 +546,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			centerPos.y += movingSpeed;
 			if (centerPos.y >= 560 - 20)
 			{
-				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 - 1;
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -590,7 +588,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
 			}
 			break;
-
 		default:
 			break;
 		}
@@ -689,16 +686,16 @@ void Hero::judgeOnProps(const Vec2 pos) {
 		std::string speed = propValueMap["speed"].asString();
 		std::string number = propValueMap["number"].asString();
 		std::string power = propValueMap["power"].asString();
-		if (speed == "true"&&movingSpeed<=5) {
-			movingSpeed++;
+		if (speed == "true") {
+			if (movingSpeed <= 5) movingSpeed++;
 			propLayer->removeTileAt(tileCoord);
 		}
-		if (power == "true"&&bubblePower<=5) {
-			bubblePower++;
+		if (power == "true") {
+			if (bubblePower <= 5) bubblePower++;
 			propLayer->removeTileAt(tileCoord);
 		}
-		if (number == "true"&&bubbleNumber<=5) {
-			bubbleNumber++;
+		if (number == "true") {
+			if (bubbleNumber <= 5) bubbleNumber++;
 			propLayer->removeTileAt(tileCoord);
 		}
 	}

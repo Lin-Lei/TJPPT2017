@@ -67,13 +67,13 @@ void Battle::menuReturnCallBack(Ref * pSender) {
 //进入单人训练地图
 void Battle::menuOneTrainCallBack(Ref* pSender) {
 	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
-	auto oneTrainScene = OneTrain::createScene();
+	auto oneTrainScene = OneExplain::createScene();
 	Director::getInstance()->replaceScene(oneTrainScene);
 }
 
 //进入双人对战地图
 void Battle::menuDoubleBattleCallBack(Ref* pSender) {
 	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
-	auto doubleBattleScene = DoubleBattle::createScene();
+	auto doubleBattleScene = TwoExplain::createScene();
 	Director::getInstance()->replaceScene(doubleBattleScene);
 }
