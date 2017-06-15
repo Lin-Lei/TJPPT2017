@@ -61,6 +61,7 @@ bool OneTrain::init(){
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
+	bubble->player1 = hero;
 
 	//初始化Map容器
 	keyCodeMap = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
@@ -75,16 +76,16 @@ bool OneTrain::init(){
 	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE && !hero->trapped) {
 			bubble->placeBubble(hero->getPosition(),hero);//完成放泡泡功能
 		}
-		if (hero->getAnimationPlaying())//正在做的动画停止
+		if (hero->getAnimationPlaying() && !hero->trapped)//正在做的动画停止
 		{
 			hero->stopAllActions();
 			hero->setAnimationPlaying(false);
 		}
 		
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			validPress = true;
 			pressCnt++;
@@ -96,7 +97,7 @@ bool OneTrain::init(){
 	//松开时调用
 	heroKeyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			pressCnt--;
 			keyCodeMap[keyCode] = false;
@@ -125,8 +126,6 @@ bool OneTrain::init(){
 				hero->setFrame(keyCode);
 			}
 		}
-		
-		
 	};
 
 	EventDispatcher* eventDispatcher = Director::getInstance()->getEventDispatcher();

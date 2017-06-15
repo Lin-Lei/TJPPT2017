@@ -43,9 +43,10 @@ class Bubble : public cocos2d::Sprite
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
 	void boomInSameTime();
+	void judgeBoomHero(Hero* player,int x,int y,int power);
 
 public:
-	
+	Hero* player1,* player2;
 	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	static Bubble* create(const std::string &filename);
 	void placeBubble(cocos2d::Vec2 pos,Hero* hero);

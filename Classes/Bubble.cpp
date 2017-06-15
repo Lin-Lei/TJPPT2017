@@ -6,7 +6,7 @@ USING_NS_CC;
 Bubble* Bubble::create(const std::string& spriteFrameName)
 {
 	Bubble *bubble = new Bubble();
-
+	bubble->player2 = NULL;
 	if (bubble && bubble->initWithSpriteFrameName(spriteFrameName)) {
 		bubble->autorelease();
 
@@ -74,12 +74,29 @@ bool Bubble::judgeBuilding(Vec2 pos) {
 	return false;
 }
 
+void Bubble::judgeBoomHero(Hero *hero,int x,int y,int power) {
+	if (hero->trapped) return;
+	int heroX, heroY;
+	Vec2 tilePos = tileCoordFromPosition(hero->getPosition());
+	heroX = tilePos.x+0.3;//防止浮点误差
+	heroY = tilePos.y+0.3;
+	if (x == heroX) {
+		if (abs(y - heroY) <= power) hero->becomeDie();
+	}
+	else if (y == heroY) {
+		if (abs(x - heroX) <= power) hero->becomeDie();
+	}
+}
+
 void Bubble::boomInSameTime() {
 	auto it = bubbleInfo.begin();
 	auto first = bubbleInfo.begin();
 	int x = bubbleInfo.begin()->tileX;
 	int y = bubbleInfo.begin()->tileY;
-	for (it++; it != bubbleInfo.end(); it++) {
+	for (; it != bubbleInfo.end(); it++) {
+		judgeBoomHero(player1, x, y,it->power);
+		if(player2!=NULL) judgeBoomHero(player2, x, y, it->power);
+		if (it->tileX == x&&it->tileY == y) continue;//躲过第一个点和放在同一个位置的点
 		if (it->tileX == x) {
 			if (abs(it->tileY - y) <= first->power) {
 				*first = *it;
@@ -107,8 +124,8 @@ void Bubble::eraseFront() {
 }
 
 //放置泡泡
-void Bubble::placeBubble(Vec2 p,Hero * hero) {//得到的坐标是人物坐标
-	if (hero->bubbleNumber == hero->placeBubbleNumber) return;
+void Bubble::placeBubble(Vec2 p, Hero * hero) {//得到的坐标是人物坐标
+	if (hero->bubbleNumber == hero->placeBubbleNumber||hero->trapped) return;
 	else {
 		hero->placeBubbleNumber++;
 		bubbleInformation bInfo;

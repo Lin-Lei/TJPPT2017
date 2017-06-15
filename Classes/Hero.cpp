@@ -38,8 +38,13 @@ Hero::Hero(int playerNo, int power, int speed, int number)
 	movingSpeed=speed;
 	bubbleNumber = number;
 	placeBubbleNumber = 0;
-
+	trapped = false;
+	die = false;
 	animationPlaying = false;
+}
+
+void Hero::toDie() {
+	die = true;
 }
 
 //创建人物
@@ -111,12 +116,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveLeftAnimation = Animation::create();
 				innitAnimation(moveLeftAnimation, 4, "hero1Left");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveLeftAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveLeftAnimation->setDelayPerUnit(0.1f);
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
@@ -145,12 +144,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveRightAnimation = Animation::create();
 				innitAnimation(moveRightAnimation, 4, "hero1Right");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveRightAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveRightAnimation->setDelayPerUnit(0.1f);
 				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
 				runAction(RepeatForever::create(moveRightAnimate));
@@ -178,12 +171,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveDownAnimation = Animation::create();
 				innitAnimation(moveDownAnimation, 4, "hero1Down");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveDownAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveDownAnimation->setDelayPerUnit(0.1f);
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
@@ -211,12 +198,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveUpAnimation = Animation::create();
 				innitAnimation(moveUpAnimation, 4, "hero1Up");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveUpAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveUpAnimation->setDelayPerUnit(0.1f);
 				moveUpAnimation->setRestoreOriginalFrame(true);
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
@@ -257,12 +238,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveLeftAnimation = Animation::create();
 				innitAnimation(moveLeftAnimation, 4, "hero1Left");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveLeftAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveLeftAnimation->setDelayPerUnit(0.1f);
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
@@ -291,12 +266,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveRightAnimation = Animation::create();
 				innitAnimation(moveRightAnimation, 4, "hero1Right");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveRightAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveRightAnimation->setDelayPerUnit(0.1f);
 				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
 				runAction(RepeatForever::create(moveRightAnimate));
@@ -324,12 +293,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveDownAnimation = Animation::create();
 				innitAnimation(moveDownAnimation, 4, "hero1Down");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveDownAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveDownAnimation->setDelayPerUnit(0.1f);
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
@@ -357,12 +320,6 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			{
 				Animation *moveUpAnimation = Animation::create();
 				innitAnimation(moveUpAnimation, 4, "hero1Up");
-				/*for (int i = 1; i <= 4; i++)
-				{
-					__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
-					SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-					moveUpAnimation->addSpriteFrame(spriteFrame);
-				}*/
 				moveUpAnimation->setDelayPerUnit(0.1f);
 				moveUpAnimation->setRestoreOriginalFrame(true);
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
@@ -495,4 +452,61 @@ void Hero::judgeOnProps(const Vec2 pos) {
 			propLayer->removeTileAt(tileCoord);
 		}
 	}
+}
+
+void Hero::becomeDie() {
+	trapped = true;
+	Animation *dyingAnimation = Animation::create();
+	innitAnimation(dyingAnimation, 4, "hero1Dying");
+	dyingAnimation->setDelayPerUnit(0.2f);
+	Animate *dyingAnimate = Animate::create(dyingAnimation);
+	
+
+	Animation *deadAnimation = Animation::create();
+	innitAnimation(deadAnimation, 4, "hero1Dead");
+	deadAnimation->setDelayPerUnit(0.2f);
+	Animate *deadAnimate = Animate::create(deadAnimation);
+	auto delayTime = DelayTime::create(0.01f);
+	auto toDieFunc=CallFunc::create(CC_CALLBACK_0(Hero::toDie, this));
+	auto dieAction = Sequence::create(Repeat::create(dyingAnimate, 6),delayTime,  toDieFunc,deadAnimate,NULL);
+	runAction(dieAction);
+
+}
+
+void Hero::becomeDie2() {
+	trapped = true;
+	Animation *dyingAnimation = Animation::create();
+	innitAnimation(dyingAnimation, 4, "hero1Dying");
+	dyingAnimation->setDelayPerUnit(0.2f);
+	Animate *dyingAnimate = Animate::create(dyingAnimation);
+
+
+	Animation *deadAnimation = Animation::create();
+	innitAnimation(deadAnimation, 4, "hero1Dead");
+	deadAnimation->setDelayPerUnit(0.2f);
+	Animate *deadAnimate = Animate::create(deadAnimation);
+	auto delayTime = DelayTime::create(0.01f);
+	auto toDieFunc = CallFunc::create(CC_CALLBACK_0(Hero::toDie, this));
+	auto dieAction = Sequence::create(Repeat::create(dyingAnimate, 6), delayTime, toDieFunc, deadAnimate, NULL);
+	runAction(dieAction);
+
+}
+
+void Hero::win() {
+	trapped = true;
+	Animation *winAnimation = Animation::create();
+	innitAnimation(winAnimation, 3, "hero1Win");
+	winAnimation->setDelayPerUnit(0.3f);
+	Animate *winAnimate = Animate::create(winAnimation);
+	runAction(RepeatForever::create(winAnimate));
+}
+
+
+void Hero::win2() {
+	trapped = true;
+	Animation *winAnimation = Animation::create();
+	innitAnimation(winAnimation, 3, "hero1Win");
+	winAnimation->setDelayPerUnit(0.3f);
+	Animate *winAnimate = Animate::create(winAnimation);
+	runAction(RepeatForever::create(winAnimate));
 }

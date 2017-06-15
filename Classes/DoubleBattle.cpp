@@ -67,6 +67,9 @@ bool DoubleBattle::init() {
 	hero2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero2, 10, HERO_2);
 
+	bubble->player1 = hero;
+	bubble->player2 = hero2;
+
 
 
 	//初始化Map容器
@@ -87,23 +90,23 @@ bool DoubleBattle::init() {
 	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER && !hero->trapped) {
 			bubble->placeBubble(hero->getPosition(), hero);//完成放泡泡功能
 		}
-		if (hero->getAnimationPlaying())//正在做的动画停止
+		if (hero->getAnimationPlaying() && !hero->trapped)//正在做的动画停止
 		{
 			hero->stopAllActions();
 			hero->setAnimationPlaying(false);
 		}
 
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			validPress1 = true;
 			pressCnt1++;
 			onPressCode1 = keyCode;
 			keyCodeMap1[keyCode] = true;
 		}
-
+		if (hero2->trapped) return;
 		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE) {
 			bubble->placeBubble(hero2->getPosition(), hero2);//完成放泡泡功能
 		}
@@ -125,7 +128,7 @@ bool DoubleBattle::init() {
 	//松开时调用
 	heroKeyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode)&&!hero->trapped)
 		{
 			pressCnt1--;
 			keyCodeMap1[keyCode] = false;
@@ -154,7 +157,7 @@ bool DoubleBattle::init() {
 				hero->setFrame(keyCode);
 			}
 		}
-
+		if (hero2->trapped) return;
 		if (checkP2(keyCode))
 		{
 			pressCnt2--;
@@ -217,7 +220,20 @@ void DoubleBattle::menuReturnCallback(cocos2d::Ref* pSender) {
 
 void DoubleBattle::update(float dt)//每秒60次更新
 {
-
+	if (hero->die) {//?????
+		hero2->win2();
+		hero->die = false;
+		auto winPic = Sprite::create("hero/Win.png");
+		winPic->setPosition(Vec2(400, 300));
+		this->addChild(winPic,20);
+	}
+	if (hero2->die) {
+		hero->win();
+		hero2->die = false;
+		auto winPic = Sprite::create("hero/Win.png");
+		winPic->setPosition(Vec2(400, 300));
+		this->addChild(winPic,20);
+	}
 	if (validPress1)
 	{
 		hero->moveHero(onPressCode1);
