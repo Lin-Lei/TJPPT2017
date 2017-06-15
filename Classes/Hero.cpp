@@ -67,27 +67,25 @@ void Hero::setPosition(const Vec2 &position)
 {
 	Size screenSize = Director::getInstance()->getVisibleSize();
 
-	float Width = this->getContentSize().width;
-	float Height = this->getContentSize().height;
 	float pos_x = position.x;
 	float pos_y = position.y;
 
-	if (pos_x < 20 + Width / 2) {
-		pos_x = 20 + Width / 2;
+	if (pos_x < 20 + 20) {
+		pos_x = 20 + 20;
 	}
-	else if (pos_x >620 - Width / 2) {
-		pos_x = 620 - Width / 2;
-	}
-
-	if (pos_y < 40 + Height / 10) {
-		pos_y = 40 + Height / 10;
-	}
-	else if (pos_y >560 - Height * 0.5) {
-		pos_y = 560 - Height * 0.5;
+	else if (pos_x >620 - 20) {
+		pos_x = 620 - 20;
 	}
 
+	if (pos_y < 40 + 6) {
+		pos_y = 40 + 6;
+	}
+	else if (pos_y >560 - 34) {
+		pos_y = 560 - 34;
+	}
 
 
+	heroPosition = Vec2(pos_x, pos_y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }
@@ -95,14 +93,20 @@ void Hero::setPosition(const Vec2 &position)
 //人物移动
 void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 {
-	Vec2 position = this->getPosition();
+	Vec2 centerPos;
+	Vec2 position = heroPosition;
+	centerPos.x = heroPosition.x;
+	centerPos.y = heroPosition.y + 14;
 
-	Vec2 collisionPos1 = position; //允许1像素的优化
-	Vec2 collisionPos2 = position;
+	Vec2 collisionPos1; //允许1像素的优化
+	Vec2 collisionPos2;
+	Vec2 collisionCenter;
 	Vec2 tileCoord1;
 	Vec2 tileCoord2;
+	Vec2 centerCoord;
 	int tileGid1;
 	int tileGid2;
+	int centerGid;
 
 
 	if (playerNo == 1)
@@ -111,7 +115,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 		{
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
 			position.x -= movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveLeftAnimation = Animation::create();
@@ -120,11 +124,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
 			}
-
-			collisionPos1.x = position.x - map->getTileSize().width / 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
-			collisionPos2.x = position.x - map->getTileSize().width / 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			centerPos.x -= movingSpeed;
+			if (centerPos.x <= 20 + 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x - 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x - 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -132,14 +141,40 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
 			}
 			break;
 
 		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 
 			position.x += movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveRightAnimation = Animation::create();
@@ -149,10 +184,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveRightAnimate));
 			}
 
-			collisionPos1.x = position.x + map->getTileSize().width / 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
-			collisionPos2.x = position.x + map->getTileSize().width / 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			centerPos.x += movingSpeed;
+			if (centerPos.x >= 620 - 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x + 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -160,13 +201,39 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
 			}
 			break;
 
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 			position.y -= movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveDownAnimation = Animation::create();
@@ -175,11 +242,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
 			}
-
-			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1;
-			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1;
+			centerPos.y -= movingSpeed;
+			if (centerPos.y <= 40 + 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y - 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y - 20;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -187,13 +259,38 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
 			}
 			break;
 
 		case EventKeyboard::KeyCode::KEY_UP_ARROW:
 			position.y += movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveUpAnimation = Animation::create();
@@ -203,11 +300,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
 				runAction(RepeatForever::create(moveUpAnimate));
 			}
-
-			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
-			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+			centerPos.y += movingSpeed;
+			if (centerPos.y >= 560 - 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y + 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y + 20;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -215,7 +317,32 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
 			}
 			break;
 
@@ -233,7 +360,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 		{
 		case EventKeyboard::KeyCode::KEY_A:
 			position.x -= movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveLeftAnimation = Animation::create();
@@ -242,11 +369,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
 			}
-
-			collisionPos1.x = position.x - map->getTileSize().width / 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
-			collisionPos2.x = position.x - map->getTileSize().width / 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			centerPos.x -= movingSpeed;
+			if (centerPos.x <= 20 + 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x - 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x - 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -254,14 +386,40 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
 			}
 			break;
 
 		case EventKeyboard::KeyCode::KEY_D:
 
 			position.x += movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveRightAnimation = Animation::create();
@@ -271,10 +429,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveRightAnimate));
 			}
 
-			collisionPos1.x = position.x + map->getTileSize().width / 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height - 2;
-			collisionPos2.x = position.x + map->getTileSize().width / 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1 + 2;
+			centerPos.x += movingSpeed;
+			if (centerPos.x >= 620 - 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x + 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -282,13 +446,39 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
 			}
 			break;
 
 		case EventKeyboard::KeyCode::KEY_S:
 			position.y -= movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveDownAnimation = Animation::create();
@@ -297,11 +487,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
 			}
-
-			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1;
-			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1;
+			centerPos.y -= movingSpeed;
+			if (centerPos.y <= 40 + 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y - 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y - 20;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -309,13 +504,38 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
 			}
 			break;
 
 		case EventKeyboard::KeyCode::KEY_W:
 			position.y += movingSpeed;
-			judgeOnProps(position);
+			judgeOnProps(centerPos);
 			if (!animationPlaying)
 			{
 				Animation *moveUpAnimation = Animation::create();
@@ -325,11 +545,16 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
 				runAction(RepeatForever::create(moveUpAnimate));
 			}
-
-			collisionPos1.x = position.x + map->getTileSize().width / 2 - 2;
-			collisionPos1.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
-			collisionPos2.x = position.x - map->getTileSize().width / 2 + 2;
-			collisionPos2.y = position.y - this->getContentSize().height*0.1 + map->getTileSize().height;
+			centerPos.y += movingSpeed;
+			if (centerPos.y >= 560 - 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y + 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y + 20;
 			tileCoord1 = tileCoordFromPosition(collisionPos1);
 			tileCoord2 = tileCoordFromPosition(collisionPos2);
 			tileGid1 = building->getTileGIDAt(tileCoord1);
@@ -337,7 +562,32 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 
 			if (tileGid1 || tileGid2)
 			{
-				position = this->getPosition();
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
 			}
 			break;
 
@@ -485,4 +735,9 @@ void Hero::win() {
 	winAnimation->setDelayPerUnit(0.3f);
 	Animate *winAnimate = Animate::create(winAnimation);
 	runAction(RepeatForever::create(winAnimate));
+}
+
+Vec2 Hero::getPosition()
+{
+	return heroPosition;
 }

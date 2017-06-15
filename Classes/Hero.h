@@ -23,7 +23,7 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* numLayer;
 	cocos2d::TMXLayer* propLayer;
 	int playerNo;
-	
+	cocos2d::Vec2 heroPosition;
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 public:
@@ -43,6 +43,7 @@ public:
 	static Hero* create(const std::string &filename, int playerNo = 1);
 		
 	void setPosition(const cocos2d::Vec2 &position);
+	cocos2d::Vec2 getPosition();
 	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);//”√”⁄“∆∂Ø”¢–€
 	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);//”¢–€æ≤÷π ±÷ÿ÷√ÕºœÒ
 
