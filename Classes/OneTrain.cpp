@@ -8,9 +8,6 @@ extern bool musicSet;
 extern bool first;
 extern bool soundSet;
 
-TMXLayer* collidable;//检测碰撞
-TMXTiledMap* oneTrainMap;//指向地图的
-
 Scene* OneTrain::createScene(){
 	auto scene = Scene::create();
 	auto layer = OneTrain::create();
@@ -37,8 +34,8 @@ bool OneTrain::init(){
 	oneTrainMap->setAnchorPoint(Vec2(0.5, 0.5));
 	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-80, origin.y + visibleSize.height / 2));
 	addChild(oneTrainMap, 1);
-
-	collidable = oneTrainMap->getLayer("building");//创建碰撞层
+	
+	building = oneTrainMap->getLayer("building");
 	
 	//返回图片菜单
 	auto returnItem = MenuItemImage::create(
@@ -59,8 +56,12 @@ bool OneTrain::init(){
 	bubble->setPosition(Vec2(origin.x , origin.y ));
 	this->addChild(bubble, 9);
 	hero = Hero::create("hero1Down.png");
+	hero->setScene(building, oneTrainMap);
+	bubble->setScene(building, oneTrainMap);
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
+
+	bubble->player1 = hero;
 
 	//初始化Map容器
 	keyCodeMap = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
@@ -75,16 +76,16 @@ bool OneTrain::init(){
 	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE && !hero->trapped) {
 			bubble->placeBubble(hero->getPosition(),hero);//完成放泡泡功能
 		}
-		if (hero->getAnimationPlaying())//正在做的动画停止
+		if (hero->getAnimationPlaying() && !hero->trapped)//正在做的动画停止
 		{
 			hero->stopAllActions();
 			hero->setAnimationPlaying(false);
 		}
 		
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			validPress = true;
 			pressCnt++;
@@ -96,7 +97,7 @@ bool OneTrain::init(){
 	//松开时调用
 	heroKeyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			pressCnt--;
 			keyCodeMap[keyCode] = false;
@@ -125,8 +126,6 @@ bool OneTrain::init(){
 				hero->setFrame(keyCode);
 			}
 		}
-		
-		
 	};
 
 	EventDispatcher* eventDispatcher = Director::getInstance()->getEventDispatcher();
@@ -140,7 +139,7 @@ bool OneTrain::init(){
 //进入游戏场景
 void OneTrain::onEnterTransitionDidFinish() {
 	Layer::onEnterTransitionDidFinish();
-	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3");
+	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3",true);
 	first = true;
 }
 

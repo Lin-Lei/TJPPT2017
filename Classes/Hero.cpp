@@ -2,32 +2,55 @@
 
 USING_NS_CC;
 
-extern TMXLayer* collidable;//检测碰撞
-extern TMXTiledMap* oneTrainMap;//指向地图的
+void Hero::innitAnimation(Animation * ani, int n, const char s[]) {//成功优化，美滋滋,大幅减小代码数量
+	for (int i = 1; i <= n; i++)
+	{
+		__String *FrameName = __String::createWithFormat("%s%d.png", s, i);
+		SpriteFrame *bubbleFrame =
+			SpriteFrameCache::getInstance()->getSpriteFrameByName(FrameName->getCString());
+		ani->addSpriteFrame(bubbleFrame);
+	}
+}
 
-/*
-人物锚点设置不当
-由于锚点改变而引发的边界问题处理不当
-getposition得到的是最外层边界
-实际上我们只想要瓦片地图的边界
-这里会出现负值导致触发断点
-*/
 
-Hero::Hero(int power, int speed, int number)
+Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,输出瓦片坐标
 {
+	int x = (position.x - 20) / map->getTileSize().width;
+	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y + 40)
+		/ map->getTileSize().height;
+	return Vec2(x, y);
+}
+
+void Hero::setScene(TMXLayer* Building,TMXTiledMap* Map) {
+	building = Building;
+	map = Map;
+	shoseLayer = map->getLayer("speed");
+	powerLayer = map->getLayer("bubblePower");
+	numLayer = map->getLayer("bubbleNum");
+	propLayer = map->getLayer("prop");
+}
+
+
+Hero::Hero(int playerNo, int power, int speed, int number)
+{
+	this->playerNo = playerNo;
 	bubblePower = power;
-	setMovingSpeed(speed);
+	movingSpeed=speed;
 	bubbleNumber = number;
 	placeBubbleNumber = 0;
-
+	trapped = false;
+	die = false;
 	animationPlaying = false;
 }
 
-//创建人物
-Hero* Hero::create(const std::string& spriteFrameName)
-{
-	Hero *hero = new Hero();
+void Hero::toDie() {
+	die = true;
+}
 
+//创建人物
+Hero* Hero::create(const std::string& spriteFrameName, int playerNo)
+{
+	Hero *hero = new Hero(playerNo);
 	if (hero && hero->initWithSpriteFrameName(spriteFrameName)) {
 		hero->autorelease();
 
@@ -44,27 +67,25 @@ void Hero::setPosition(const Vec2 &position)
 {
 	Size screenSize = Director::getInstance()->getVisibleSize();
 
-	float Width = this->getContentSize().width ;
-	float Height = this->getContentSize().height;
 	float pos_x = position.x;
 	float pos_y = position.y;
 
-	if (pos_x < 20 + Width / 2) {
-		pos_x = 20 + Width / 2;
+	if (pos_x < 20 + 20) {
+		pos_x = 20 + 20;
 	}
-	else if (pos_x >620 - Width / 2) {
-		pos_x = 620 - Width / 2;
-	}
-
-	if (pos_y < 40 + Height / 10) {
-		pos_y = 40 + Height / 10;
-	}
-	else if (pos_y >560 - Height * 0.5) {
-		pos_y = 560 - Height * 0.5;
+	else if (pos_x >620 - 20) {
+		pos_x = 620 - 20;
 	}
 
-	
+	if (pos_y < 40 + 6) {
+		pos_y = 40 + 6;
+	}
+	else if (pos_y >560 - 34) {
+		pos_y = 560 - 34;
+	}
 
+
+	heroPosition = Vec2(pos_x, pos_y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }
@@ -72,140 +93,651 @@ void Hero::setPosition(const Vec2 &position)
 //人物移动
 void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 {
-	Vec2 position = this->getPosition();
-	log("%f, %f", position.x, position.y);
+	Vec2 centerPos;
+	Vec2 position = heroPosition;
+	centerPos.x = heroPosition.x;
+	centerPos.y = heroPosition.y + 14;
 
-	switch (keyCode)
+	Vec2 collisionPos1; //允许1像素的优化
+	Vec2 collisionPos2;
+	Vec2 collisionCenter;
+	Vec2 tileCoord1;
+	Vec2 tileCoord2;
+	Vec2 centerCoord;
+	int tileGid1;
+	int tileGid2;
+	int centerGid;
+
+
+	if (playerNo == 1)
 	{
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		position.x -= movingSpeed;
-		if (!animationPlaying)
+		switch (keyCode)
 		{
-			Animation *moveLeftAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+			position.x -= movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
 			{
-				__String *frameName = __String::createWithFormat("hero1Left%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveLeftAnimation->addSpriteFrame(spriteFrame);
+				Animation *moveLeftAnimation = Animation::create();
+				innitAnimation(moveLeftAnimation, 4, "hero1Left");
+				moveLeftAnimation->setDelayPerUnit(0.1f);
+				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
+				runAction(RepeatForever::create(moveLeftAnimate));
 			}
-			moveLeftAnimation->setDelayPerUnit(0.1f);
-			Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
-			runAction(RepeatForever::create(moveLeftAnimate));
-		}
-		break;
-		
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		
-		position.x += movingSpeed;
-		if (!animationPlaying)
-		{
-			Animation *moveRightAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
+			centerPos.x -= movingSpeed;
+			if (centerPos.x <= 20 + 20)
 			{
-				__String *frameName = __String::createWithFormat("hero1Right%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveRightAnimation->addSpriteFrame(spriteFrame);
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
 			}
-			moveRightAnimation->setDelayPerUnit(0.1f);
-			Animate *moveRightAnimate = Animate::create(moveRightAnimation);
-			runAction(RepeatForever::create(moveRightAnimate));
-		}
-		break;
-		
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		position.y -= movingSpeed;
-		if (!animationPlaying)
-		{
-			Animation *moveDownAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
-			{
-				__String *frameName = __String::createWithFormat("hero1Down%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveDownAnimation->addSpriteFrame(spriteFrame);
-			}
-			moveDownAnimation->setDelayPerUnit(0.1f);
-			Animate *moveDownAnimate = Animate::create(moveDownAnimation);
-			runAction(RepeatForever::create(moveDownAnimate));
-		}
-		break;
-		
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		position.y += movingSpeed;
-		if (!animationPlaying)
-		{
-			Animation *moveUpAnimation = Animation::create();
-			for (int i = 1; i <= 4; i++)
-			{
-				__String *frameName = __String::createWithFormat("hero1Up%d.png", i);
-				SpriteFrame *spriteFrame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName->getCString());
-				moveUpAnimation->addSpriteFrame(spriteFrame);
-			}
-			moveUpAnimation->setDelayPerUnit(0.1f);
-			moveUpAnimation->setRestoreOriginalFrame(true);
-			Animate *moveUpAnimate = Animate::create(moveUpAnimation);
-			runAction(RepeatForever::create(moveUpAnimate));
-		}
-		break;
+			collisionPos1.x = centerPos.x - 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x - 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-	default:
-		break;
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+
+			position.x += movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveRightAnimation = Animation::create();
+				innitAnimation(moveRightAnimation, 4, "hero1Right");
+				moveRightAnimation->setDelayPerUnit(0.1f);
+				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
+				runAction(RepeatForever::create(moveRightAnimate));
+			}
+
+			centerPos.x += movingSpeed;
+			if (centerPos.x >= 620 - 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x + 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+			position.y -= movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveDownAnimation = Animation::create();
+				innitAnimation(moveDownAnimation, 4, "hero1Down");
+				moveDownAnimation->setDelayPerUnit(0.1f);
+				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
+				runAction(RepeatForever::create(moveDownAnimate));
+			}
+			centerPos.y -= movingSpeed;
+			if (centerPos.y <= 40 + 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y - 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y - 20;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+			position.y += movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveUpAnimation = Animation::create();
+				innitAnimation(moveUpAnimation, 4, "hero1Up");
+				moveUpAnimation->setDelayPerUnit(0.1f);
+				moveUpAnimation->setRestoreOriginalFrame(true);
+				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
+				runAction(RepeatForever::create(moveUpAnimate));
+			}
+			centerPos.y += movingSpeed;
+			if (centerPos.y >= 560 - 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y + 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y + 20;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+			}
+			break;
+
+		default:
+			break;
+		}
+
+
+		this->setPosition(position);
 	}
 
-	//从像素点坐标转化为瓦片坐标
-	Vec2 tileCoord = this->tileCoordFromPosition(position);
-	//获得瓦片的GID
-	int tileGid = collidable->getTileGIDAt(tileCoord);
+	else if (playerNo == 2)//wsad控制移动
+	{
+		switch (keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_A:
+			position.x -= movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveLeftAnimation = Animation::create();
+				innitAnimation(moveLeftAnimation, 4, "hero2Left");
+				moveLeftAnimation->setDelayPerUnit(0.1f);
+				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
+				runAction(RepeatForever::create(moveLeftAnimate));
+			}
+			centerPos.x -= movingSpeed;
+			if (centerPos.x <= 20 + 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x - 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x - 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-	if (tileGid > 0) {
-		
-		position = this->getPosition();
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_D:
+
+			position.x += movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveRightAnimation = Animation::create();
+				innitAnimation(moveRightAnimation, 4, "hero2Right");
+				moveRightAnimation->setDelayPerUnit(0.1f);
+				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
+				runAction(RepeatForever::create(moveRightAnimate));
+			}
+
+			centerPos.x += movingSpeed;
+			if (centerPos.x >= 620 - 20)
+			{
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20;
+			collisionPos1.y = centerPos.y + 20 - 1;
+			collisionPos2.x = centerPos.x + 20;
+			collisionPos2.y = centerPos.y - 20 + 1;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+					{
+						position.y += movingSpeed;
+						centerPos.y += movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 < 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+					else
+					{
+						position.y -= movingSpeed;
+						centerPos.y -= movingSpeed;
+						if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
+						{
+							position.y = 560 - tileCoordFromPosition(centerPos).y * 40 - 34;
+						}
+					}
+				}
+				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20;
+
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_S:
+			position.y -= movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveDownAnimation = Animation::create();
+				innitAnimation(moveDownAnimation, 4, "hero2Down");
+				moveDownAnimation->setDelayPerUnit(0.1f);
+				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
+				runAction(RepeatForever::create(moveDownAnimate));
+			}
+			centerPos.y -= movingSpeed;
+			if (centerPos.y <= 40 + 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y - 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y - 20;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+			}
+			break;
+
+		case EventKeyboard::KeyCode::KEY_W:
+			position.y += movingSpeed;
+			judgeOnProps(centerPos);
+			if (!animationPlaying)
+			{
+				Animation *moveUpAnimation = Animation::create();
+				innitAnimation(moveUpAnimation, 4, "hero2Up");
+				moveUpAnimation->setDelayPerUnit(0.1f);
+				moveUpAnimation->setRestoreOriginalFrame(true);
+				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
+				runAction(RepeatForever::create(moveUpAnimate));
+			}
+			centerPos.y += movingSpeed;
+			if (centerPos.y >= 560 - 20)
+			{
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+				break;
+			}
+			collisionPos1.x = centerPos.x + 20 - 1;
+			collisionPos1.y = centerPos.y + 20;
+			collisionPos2.x = centerPos.x - 20 + 1;
+			collisionPos2.y = centerPos.y + 20;
+			tileCoord1 = tileCoordFromPosition(collisionPos1);
+			tileCoord2 = tileCoordFromPosition(collisionPos2);
+			tileGid1 = building->getTileGIDAt(tileCoord1);
+			tileGid2 = building->getTileGIDAt(tileCoord2);
+
+			if (tileGid1 || tileGid2)
+			{
+				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
+				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
+				centerCoord = tileCoordFromPosition(collisionCenter);
+				centerGid = building->getTileGIDAt(centerCoord);
+				if (centerGid == 0)
+				{
+					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+					{
+						position.x -= movingSpeed;
+						centerPos.x -= movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 < 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+					else
+					{
+						position.x += movingSpeed;
+						centerPos.x += movingSpeed;
+						if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
+						{
+							position.x = 20 + tileCoordFromPosition(centerPos).x * 40 + 20;
+						}
+					}
+				}
+				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34;
+			}
+			break;
+
+		default:
+			break;
+		}
+
+
+		this->setPosition(position);
 	}
-
-
-	this->setPosition(position);
+	
 }
 
 void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 {
-	switch (keyCode)
+	if (playerNo == 1)
 	{
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-	{
-		SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Left.png");
-		setSpriteFrame(hero1Left);
-	}
+		switch (keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+		{
+			SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Left.png");
+			setSpriteFrame(hero1Left);
+		}
 		break;
 
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-	{
-		SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Right.png");
-		setSpriteFrame(hero1Right);
-	}
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+		{
+			SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Right.png");
+			setSpriteFrame(hero1Right);
+		}
 		break;
 
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-	{
-		SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Down.png");
-		setSpriteFrame(hero1Down);
-	}
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+		{
+			SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Down.png");
+			setSpriteFrame(hero1Down);
+		}
 		break;
 
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-	{
-		SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Up.png");
-		setSpriteFrame(hero1Up);
-	}
+		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+		{
+			SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Up.png");
+			setSpriteFrame(hero1Up);
+		}
 		break;
 
-	default:
+		default:
+			break;
+		}
+	}
+	
+	else if (playerNo == 2)
+	{
+		switch (keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_A:
+		{
+			SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Left.png");
+			setSpriteFrame(hero1Left);
+		}
 		break;
+
+		case EventKeyboard::KeyCode::KEY_D:
+		{
+			SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Right.png");
+			setSpriteFrame(hero1Right);
+		}
+		break;
+
+		case EventKeyboard::KeyCode::KEY_S:
+		{
+			SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Down.png");
+			setSpriteFrame(hero1Down);
+		}
+		break;
+
+		case EventKeyboard::KeyCode::KEY_W:
+		{
+			SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Up.png");
+			setSpriteFrame(hero1Up);
+		}
+		break;
+
+		default:
+			break;
+		}
+	}
+
+}
+
+//判断道具，并进行属性更改
+void Hero::judgeOnProps(const Vec2 pos) {
+	Vec2 tileCoord = tileCoordFromPosition(pos);
+	int tileGid= propLayer->getTileGIDAt(tileCoord);
+	if (tileGid) {
+		Value prop = map->getPropertiesForGID(tileGid);
+		ValueMap propValueMap = prop.asValueMap();
+		std::string speed = propValueMap["speed"].asString();
+		std::string number = propValueMap["number"].asString();
+		std::string power = propValueMap["power"].asString();
+		if (speed == "true"&&movingSpeed<=5) {
+			movingSpeed++;
+			propLayer->removeTileAt(tileCoord);
+		}
+		if (power == "true"&&bubblePower<=5) {
+			bubblePower++;
+			propLayer->removeTileAt(tileCoord);
+		}
+		if (number == "true"&&bubbleNumber<=5) {
+			bubbleNumber++;
+			propLayer->removeTileAt(tileCoord);
+		}
 	}
 }
 
-Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标
+void Hero::becomeDie() {
+	trapped = true;
+	stopAllActions();
+	Animation *dyingAnimation = Animation::create();
+	if(playerNo==1) innitAnimation(dyingAnimation, 4, "hero1Dying");
+	else innitAnimation(dyingAnimation, 4, "hero2Dying");
+	dyingAnimation->setDelayPerUnit(0.2f);
+	Animate *dyingAnimate = Animate::create(dyingAnimation);
+	
+
+	Animation *deadAnimation = Animation::create();
+	if(playerNo==1) innitAnimation(deadAnimation, 4, "hero1Dead");
+	else innitAnimation(deadAnimation, 4, "hero2Dead");
+	deadAnimation->setDelayPerUnit(0.2f);
+	Animate *deadAnimate = Animate::create(deadAnimation);
+	auto delayTime = DelayTime::create(0.01f);
+	auto toDieFunc=CallFunc::create(CC_CALLBACK_0(Hero::toDie, this));
+	auto dieAction = Sequence::create(Repeat::create(dyingAnimate, 6),delayTime,  toDieFunc,deadAnimate,NULL);
+	runAction(dieAction);
+
+}
+
+void Hero::win() {
+	trapped = true;
+	stopAllActions();
+	Animation *winAnimation = Animation::create();
+	if(playerNo==1) innitAnimation(winAnimation, 3, "hero1Win");
+	else innitAnimation(winAnimation, 3, "hero2Win");
+	winAnimation->setDelayPerUnit(0.3f);
+	Animate *winAnimate = Animate::create(winAnimation);
+	runAction(RepeatForever::create(winAnimate));
+}
+
+Vec2 Hero::getPosition()
 {
-	int x = (position.x - 20) / oneTrainMap->getTileSize().width ;
-	int y = ((oneTrainMap->getMapSize().height*oneTrainMap->getTileSize().height) - position.y + 40)
-		/ oneTrainMap->getTileSize().height ;
-	return Vec2(x, y);
+	return heroPosition;
 }

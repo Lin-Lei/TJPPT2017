@@ -18,6 +18,9 @@ class OneTrain : public cocos2d::Layer
 public:
 	static cocos2d::Scene* createScene();
 
+	cocos2d::TMXLayer* building;
+	cocos2d::TMXTiledMap* oneTrainMap;//指向地图的
+
 	virtual bool init();
 	virtual void OneTrain::update(float dt);
 	virtual void OneTrain::onEnterTransitionDidFinish();

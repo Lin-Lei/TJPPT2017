@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="7">
  <tileset firstgid="1" name="TownGround" tilewidth="40" tileheight="40" tilecount="7" columns="7">
   <image source="TownGround.jpg" width="280" height="40"/>
  </tileset>
  <tileset firstgid="8" name="TownBox" tilewidth="40" tileheight="40" tilecount="1" columns="1">
+  <properties>
+   <property name="Collidable" value="true"/>
+  </properties>
   <image source="TownBox.jpg" width="40" height="44"/>
+ </tileset>
+ <tileset firstgid="9" name="prop" tilewidth="40" tileheight="45" tilecount="3" columns="3">
+  <image source="prop.png" width="120" height="45"/>
   <tile id="0">
    <properties>
-    <property name="Collidable" value="true"/>
+    <property name="power" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="speed" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="number" value="true"/>
    </properties>
   </tile>
  </tileset>
@@ -28,6 +44,23 @@
 2,2,2,2,1,1,3,6,3,2,2,2,2,2,2
 </data>
  </layer>
+ <layer name="prop" width="15" height="13">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,10,0,0,0,0,0,10,0,0,11,0,
+0,0,11,0,0,0,0,0,0,0,0,0,9,0,0,
+0,0,0,0,9,0,0,0,0,0,11,0,0,0,0,
+0,0,10,0,0,0,10,9,11,0,0,0,0,10,0,
+0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,
+0,11,0,0,0,0,0,0,0,0,11,0,0,9,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,0,10,0,11,9,10,0,10,0,11,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,10,0,0,0,0,0,0,0,0,0,0,10,0,0,
+0,0,0,11,0,0,0,0,0,0,11,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
  <layer name="building" width="15" height="13">
   <data encoding="csv">
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
@@ -35,9 +68,9 @@
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
-8,8,8,0,8,8,0,0,0,0,0,8,8,8,8,
-8,8,0,0,0,0,0,0,0,0,0,8,8,8,8,
-8,8,8,0,8,8,0,0,0,0,0,8,8,8,8,
+8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
+8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
+8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
 8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,
