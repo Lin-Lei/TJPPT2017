@@ -29,13 +29,10 @@ class Hero : public cocos2d::Sprite
 public:
 	bool trapped,die;
 	void toDie();
-	void toDie2();
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
 	void win();
-	void win2();
 	void becomeDie();
-	void becomeDie2();
 	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	void judgeOnProps(const cocos2d::Vec2 pos);
 

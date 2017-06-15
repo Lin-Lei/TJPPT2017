@@ -50,6 +50,7 @@ bool DoubleBattle::init() {
 
 	//创建人物
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero1Basic.plist");//缓存人物动画
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero2Basic.plist");//缓存人物动画
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Bubble/bubble_all.plist");//缓存泡泡动画
 	bubble = Bubble::create("bubble0.png");
 	bubble->setAnchorPoint(Vec2(0.5f, 0.5f));
@@ -62,7 +63,7 @@ bool DoubleBattle::init() {
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
-	hero2 = Hero::create("hero1Down.png", 2);
+	hero2 = Hero::create("hero2Down.png", 2);
 	hero2->setScene(building, doubleBattleMap);
 	hero2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero2, 10, HERO_2);
@@ -221,7 +222,7 @@ void DoubleBattle::menuReturnCallback(cocos2d::Ref* pSender) {
 void DoubleBattle::update(float dt)//每秒60次更新
 {
 	if (hero->die) {//?????
-		hero2->win2();
+		hero2->win();
 		hero->die = false;
 		auto winPic = Sprite::create("hero/Win.png");
 		winPic->setPosition(Vec2(400, 300));

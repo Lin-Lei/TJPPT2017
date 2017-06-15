@@ -237,7 +237,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveLeftAnimation = Animation::create();
-				innitAnimation(moveLeftAnimation, 4, "hero1Left");
+				innitAnimation(moveLeftAnimation, 4, "hero2Left");
 				moveLeftAnimation->setDelayPerUnit(0.1f);
 				Animate *moveLeftAnimate = Animate::create(moveLeftAnimation);
 				runAction(RepeatForever::create(moveLeftAnimate));
@@ -265,7 +265,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveRightAnimation = Animation::create();
-				innitAnimation(moveRightAnimation, 4, "hero1Right");
+				innitAnimation(moveRightAnimation, 4, "hero2Right");
 				moveRightAnimation->setDelayPerUnit(0.1f);
 				Animate *moveRightAnimate = Animate::create(moveRightAnimation);
 				runAction(RepeatForever::create(moveRightAnimate));
@@ -292,7 +292,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveDownAnimation = Animation::create();
-				innitAnimation(moveDownAnimation, 4, "hero1Down");
+				innitAnimation(moveDownAnimation, 4, "hero2Down");
 				moveDownAnimation->setDelayPerUnit(0.1f);
 				Animate *moveDownAnimate = Animate::create(moveDownAnimation);
 				runAction(RepeatForever::create(moveDownAnimate));
@@ -319,7 +319,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			if (!animationPlaying)
 			{
 				Animation *moveUpAnimation = Animation::create();
-				innitAnimation(moveUpAnimation, 4, "hero1Up");
+				innitAnimation(moveUpAnimation, 4, "hero2Up");
 				moveUpAnimation->setDelayPerUnit(0.1f);
 				moveUpAnimation->setRestoreOriginalFrame(true);
 				Animate *moveUpAnimate = Animate::create(moveUpAnimation);
@@ -396,28 +396,28 @@ void Hero::setFrame(const cocos2d::EventKeyboard::KeyCode keyCode)
 		{
 		case EventKeyboard::KeyCode::KEY_A:
 		{
-			SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Left.png");
+			SpriteFrame *hero1Left = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Left.png");
 			setSpriteFrame(hero1Left);
 		}
 		break;
 
 		case EventKeyboard::KeyCode::KEY_D:
 		{
-			SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Right.png");
+			SpriteFrame *hero1Right = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Right.png");
 			setSpriteFrame(hero1Right);
 		}
 		break;
 
 		case EventKeyboard::KeyCode::KEY_S:
 		{
-			SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Down.png");
+			SpriteFrame *hero1Down = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Down.png");
 			setSpriteFrame(hero1Down);
 		}
 		break;
 
 		case EventKeyboard::KeyCode::KEY_W:
 		{
-			SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero1Up.png");
+			SpriteFrame *hero1Up = SpriteFrameCache::getInstance()->getSpriteFrameByName("hero2Up.png");
 			setSpriteFrame(hero1Up);
 		}
 		break;
@@ -439,15 +439,15 @@ void Hero::judgeOnProps(const Vec2 pos) {
 		std::string speed = propValueMap["speed"].asString();
 		std::string number = propValueMap["number"].asString();
 		std::string power = propValueMap["power"].asString();
-		if (speed == "true") {
+		if (speed == "true"&&movingSpeed<=5) {
 			movingSpeed++;
 			propLayer->removeTileAt(tileCoord);
 		}
-		if (power == "true") {
+		if (power == "true"&&bubblePower<=5) {
 			bubblePower++;
 			propLayer->removeTileAt(tileCoord);
 		}
-		if (number == "true") {
+		if (number == "true"&&bubbleNumber<=5) {
 			bubbleNumber++;
 			propLayer->removeTileAt(tileCoord);
 		}
@@ -456,14 +456,17 @@ void Hero::judgeOnProps(const Vec2 pos) {
 
 void Hero::becomeDie() {
 	trapped = true;
+	stopAllActions();
 	Animation *dyingAnimation = Animation::create();
-	innitAnimation(dyingAnimation, 4, "hero1Dying");
+	if(playerNo==1) innitAnimation(dyingAnimation, 4, "hero1Dying");
+	else innitAnimation(dyingAnimation, 4, "hero2Dying");
 	dyingAnimation->setDelayPerUnit(0.2f);
 	Animate *dyingAnimate = Animate::create(dyingAnimation);
 	
 
 	Animation *deadAnimation = Animation::create();
-	innitAnimation(deadAnimation, 4, "hero1Dead");
+	if(playerNo==1) innitAnimation(deadAnimation, 4, "hero1Dead");
+	else innitAnimation(deadAnimation, 4, "hero2Dead");
 	deadAnimation->setDelayPerUnit(0.2f);
 	Animate *deadAnimate = Animate::create(deadAnimation);
 	auto delayTime = DelayTime::create(0.01f);
@@ -473,39 +476,12 @@ void Hero::becomeDie() {
 
 }
 
-void Hero::becomeDie2() {
-	trapped = true;
-	Animation *dyingAnimation = Animation::create();
-	innitAnimation(dyingAnimation, 4, "hero1Dying");
-	dyingAnimation->setDelayPerUnit(0.2f);
-	Animate *dyingAnimate = Animate::create(dyingAnimation);
-
-
-	Animation *deadAnimation = Animation::create();
-	innitAnimation(deadAnimation, 4, "hero1Dead");
-	deadAnimation->setDelayPerUnit(0.2f);
-	Animate *deadAnimate = Animate::create(deadAnimation);
-	auto delayTime = DelayTime::create(0.01f);
-	auto toDieFunc = CallFunc::create(CC_CALLBACK_0(Hero::toDie, this));
-	auto dieAction = Sequence::create(Repeat::create(dyingAnimate, 6), delayTime, toDieFunc, deadAnimate, NULL);
-	runAction(dieAction);
-
-}
-
 void Hero::win() {
 	trapped = true;
+	stopAllActions();
 	Animation *winAnimation = Animation::create();
-	innitAnimation(winAnimation, 3, "hero1Win");
-	winAnimation->setDelayPerUnit(0.3f);
-	Animate *winAnimate = Animate::create(winAnimation);
-	runAction(RepeatForever::create(winAnimate));
-}
-
-
-void Hero::win2() {
-	trapped = true;
-	Animation *winAnimation = Animation::create();
-	innitAnimation(winAnimation, 3, "hero1Win");
+	if(playerNo==1) innitAnimation(winAnimation, 3, "hero1Win");
+	else innitAnimation(winAnimation, 3, "hero2Win");
 	winAnimation->setDelayPerUnit(0.3f);
 	Animate *winAnimate = Animate::create(winAnimation);
 	runAction(RepeatForever::create(winAnimate));
