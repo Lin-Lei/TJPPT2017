@@ -15,6 +15,7 @@ typedef enum
 	HERO_8
 } HeroTag;
 
+
 class Hero : public cocos2d::Sprite
 {
 	CC_SYNTHESIZE(bool, animationPlaying, AnimationPlaying);
