@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include"Hero.h"
 #include<list>
+
 class bubbleInformation {
 public:
 	cocos2d::Sprite *bubble;
@@ -17,7 +18,7 @@ public:
 		position = cocos2d::Vec2(0, 0);
 		power = tileX = tileY = 0;
 	}
-	~bubbleInformation()=default;
+	~bubbleInformation() = default;
 	bubbleInformation& operator=(const bubbleInformation& a) {
 		bubble = a.bubble;
 		position = a.position;
@@ -26,6 +27,7 @@ public:
 		return *this;
 	}
 };
+
 
 class Bubble : public cocos2d::Sprite
 {
@@ -54,5 +56,7 @@ public:
 	static Bubble* create(const std::string &filename);
 	void placeBubble(cocos2d::Vec2 pos,Hero* hero);
 };
+
+
 
 #endif //__FIGHTER_SPRITE_H__

@@ -71,20 +71,8 @@ void Hero::setPosition(const Vec2 &position)
 	float pos_x = position.x;
 	float pos_y = position.y;
 
-	if (pos_x < 20 + 20) {
-		pos_x = 20 + 20;
-	}
-	else if (pos_x >620 - 20) {
-		pos_x = 620 - 20;
-	}
-
-	if (pos_y < 40 + 6) {
-		pos_y = 40 + 6;
-	}
-	else if (pos_y >560 - 34) {
-		pos_y = 560 - 34;
-	}
 	heroPosition = Vec2(pos_x, pos_y);
+	centerPosition = Vec2(pos_x, pos_y + 14);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }
@@ -138,13 +126,15 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
+
 			if (tileGid1 || tileGid2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+
+				if (centerGid == 0 )
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -737,4 +727,9 @@ void Hero::win() {
 Vec2 Hero::getPosition()
 {
 	return heroPosition;
+}
+
+Vec2 Hero::getCenterPosition()
+{
+	return centerPosition;
 }

@@ -2,6 +2,7 @@
 #define __HERO_H__
 
 #include "cocos2d.h"
+#include<list>
 
 typedef enum
 {
@@ -23,7 +24,8 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* numLayer;
 	cocos2d::TMXLayer* propLayer;
 	int playerNo;
-	cocos2d::Vec2 heroPosition;
+	cocos2d::Vec2 heroPosition;//用于人物绘制
+	cocos2d::Vec2 centerPosition;//用于逻辑判断
 	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 public:
@@ -43,10 +45,14 @@ public:
 	static Hero* create(const std::string &filename, int playerNo = 1);
 		
 	void setPosition(const cocos2d::Vec2 &position);
-	cocos2d::Vec2 getPosition();
+	cocos2d::Vec2 getPosition();//用于人物绘制
+	cocos2d::Vec2 getCenterPosition();//用于逻辑判断
 	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);//用于移动英雄
 	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);//英雄静止时重置图像
 
+	
+
 };
+
 
 #endif //__FIGHTER_SPRITE_H__

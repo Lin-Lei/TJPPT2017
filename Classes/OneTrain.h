@@ -32,8 +32,6 @@ public:
 
 	CREATE_FUNC(OneTrain);
 
-	
-
 };
 
 #endif 
