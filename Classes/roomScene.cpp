@@ -119,7 +119,7 @@ void RoomScene::menuConnectRoomCallBack(Ref* pSender){//client
 
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	sockClient = socket(AF_INET, SOCK_STREAM, 0);
-	addrServer.sin_addr.S_un.S_addr = inet_addr("192.168.1.106");//目标IP(127.0.0.1是回送地址)
+	addrServer.sin_addr.S_un.S_addr = inet_addr("192.168.1.110");
 	addrServer.sin_family = AF_INET;
 	addrServer.sin_port = htons(12527);//连接端口6000
 									  //连接到服务端

@@ -16,6 +16,13 @@ typedef enum
 } HeroTag;
 
 
+class bubblePosition{
+public:
+	int tileX, tileY;
+	cocos2d::Vec2 position;
+};
+
+
 class Hero : public cocos2d::Sprite
 {
 	CC_SYNTHESIZE(bool, animationPlaying, AnimationPlaying);
