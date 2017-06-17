@@ -10,18 +10,22 @@
 
 class RoomScene : public cocos2d::Layer
 {
-
+	char sendBuf[100];//发送至客户端的字符串
+	char recvBuf[100];//接受客户端返回的字符串
+	SOCKET sockClient;
 	cocos2d::Size visibleSize;
 	cocos2d::Vec2 origin;
-	void input(char s[]);
-	cocos2d::EventListenerKeyboard* listener;//创建键盘事件监听器
+	cocos2d::Vec2 mid;
+	bool finish;
 public:
 	static cocos2d::Scene* createScene();
 	virtual bool init();
 	void menuCreatRoomCallBack(Ref* pSender);
 	void menuConnectRoomCallBack(Ref* pSender);
-
+	virtual void onEnter();
+	virtual void cleanup();
 	cocos2d::TextFieldTTF* text;
+	cocos2d::TextFieldTTF* recvText;
 	CREATE_FUNC(RoomScene);
 };
 
