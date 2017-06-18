@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="7">
  <tileset firstgid="1" name="TownGround" tilewidth="40" tileheight="40" tilecount="7" columns="7">
-  <image source="TownGround.jpg" width="280" height="40"/>
+  <image source="ground.jpg" width="280" height="40"/>
  </tileset>
  <tileset firstgid="8" name="TownBox" tilewidth="40" tileheight="40" tilecount="1" columns="1">
   <properties>

@@ -28,6 +28,7 @@ void Hero::setScene(TMXLayer* Building,TMXTiledMap* Map) {
 	powerLayer = map->getLayer("bubblePower");
 	numLayer = map->getLayer("bubbleNum");
 	propLayer = map->getLayer("prop");
+	barrierLayer = map->getLayer("barrier");
 }
 
 
@@ -93,8 +94,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 	Vec2 tileCoord1;
 	Vec2 tileCoord2;
 	Vec2 centerCoord;
-	int tileGid1;
+	int tileGid1;//building²ãÅÐ¶Ï
 	int tileGid2;
+	int tileGid3;//barrier²ãÅÐ¶Ï
+	int tileGid4;
 	int centerGid;
 	int turn;
 
@@ -138,9 +141,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4 )
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -208,9 +214,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -276,9 +285,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -344,9 +356,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -423,9 +438,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -492,9 +510,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -560,9 +581,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -628,9 +652,12 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 			bubble1 = checkBubble(tileCoord1, bubblePos);
 			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+			tileGid3 = barrierLayer->getTileGIDAt(tileCoord1);
+			tileGid4 = barrierLayer->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2 || bubble1 || bubble2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2, tileGid3, tileGid4);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2 || tileGid3 || tileGid4)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
@@ -831,12 +858,14 @@ bool Hero::checkBubble(Vec2 position, std::list<bubblePosition>bubblePos)
 	return check;
 }
 
-int Hero::countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2)
+int Hero::countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2, int tileGid3, int tileGid4)
 {
 	int count = 0;
 	if (tileGid1) count++;
 	if (tileGid2) count++;
 	if (bubble1) count++;
 	if (bubble2) count++;
+	if (tileGid3) count++;
+	if (tileGid4) count++;
 	return count;
 }

@@ -30,6 +30,7 @@ class Hero : public cocos2d::Sprite
 	cocos2d::TMXLayer* powerLayer;
 	cocos2d::TMXLayer* numLayer;
 	cocos2d::TMXLayer* propLayer;
+	cocos2d::TMXLayer* barrierLayer;
 	int playerNo;
 	cocos2d::Vec2 heroPosition;//用于人物绘制
 	cocos2d::Vec2 centerPosition;//用于逻辑判断
@@ -59,7 +60,7 @@ public:
 
 	bool checkBubble(cocos2d::Vec2 position, std::list<bubblePosition>bubblePos);
 
-	int countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2);
+	int countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2, int tileGid3, int tileGid4);
 
 };
 
