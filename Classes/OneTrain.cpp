@@ -160,7 +160,7 @@ void OneTrain::update(float dt)//每秒60次更新
 
 	if (validPress)
 	{
-		hero->moveHero(onPressCode);
+		hero->moveHero(onPressCode, bubble->bubblePos);
 		hero->setAnimationPlaying(true);
 	}
 	

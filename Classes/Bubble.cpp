@@ -44,15 +44,16 @@ void Bubble::resetPlaceBubbleNum(Hero *hero) {
 	hero->placeBubbleNumber--;
 }
 
-Vec2 Bubble::getPlacePosition(Vec2 position,bubbleInformation *bInfo) {//得到人物坐标，输出泡泡坐标
+Vec2 Bubble::getPlacePosition(Vec2 position,bubbleInformation *bInfo,bubblePosition *bPos) {//得到人物坐标，输出泡泡坐标
 	Vec2 post = tileCoordFromPosition(position);
-	bInfo->tileX = post.x;
-	bInfo->tileY = post.y;
+	bPos->tileX = bInfo->tileX = post.x;
+	bPos->tileY = bInfo->tileY = post.y;
+	
 	float x = post.x*map->getTileSize().width + map->getTileSize().width / 2 + 20 + this->getContentSize().width / 2;
 	float y= (map->getMapSize().height - post.y -1)*map->getTileSize().height +//为什么？
 		map->getTileSize().height/2 + 40 + this->getContentSize().height / 2-1;
-	bInfo->position.x = x;
-	bInfo->position.y = y;
+	bPos->position.x=bInfo->position.x = x;
+	bPos->position.y=bInfo->position.y = y;
 	return Vec2(x, y);
 }
 
@@ -95,7 +96,7 @@ void Bubble::judgeBoomHero(Hero *hero,int x,int y,int power) {
 		if (abs(x - heroX) <= power) hero->becomeDie();
 	}
 }
-int c = 0;
+
 void Bubble::boomInSameTime() {
 	auto it = bubbleInfo.begin();
 	auto first = bubbleInfo.begin();
@@ -131,8 +132,10 @@ void Bubble::boomInSameTime() {
 }
 
 void Bubble::eraseFront() {
-	if(!bubbleInfo.empty())
+	if (!bubbleInfo.empty()) {
 		bubbleInfo.pop_front();
+		bubblePos.pop_front();
+	}
 }
 
 //放置泡泡
@@ -140,7 +143,8 @@ void Bubble::placeBubble(Vec2 p, Hero * hero) {//得到的坐标是人物坐标
 	if (hero->bubbleNumber == hero->placeBubbleNumber||hero->trapped) return;
 	else {
 		bubbleInformation bInfo;
-		Vec2 position = getPlacePosition(p, &bInfo);
+		bubblePosition bPos;
+		Vec2 position = getPlacePosition(p, &bInfo,&bPos);
 		for (const auto &i : bubbleInfo) {
 			if (i.tileX == bInfo.tileX&&i.tileY == bInfo.tileY) return;
 		}
@@ -155,6 +159,7 @@ void Bubble::placeBubble(Vec2 p, Hero * hero) {//得到的坐标是人物坐标
 		this->addChild(bubble);
 		bInfo.bubble = bubble;
 		bubbleInfo.push_back(bInfo);
+		bubblePos.push_back(bPos);
 		
 		Animation *bubbleAnimation = Animation::create();//设置初试泡泡跳动动画
 		innitAnimation(bubbleAnimation, 3, "bubble");
@@ -170,7 +175,6 @@ void Bubble::placeBubble(Vec2 p, Hero * hero) {//得到的坐标是人物坐标
 }
 
 void Bubble::bubbleBoom(Hero* hero) {
-	c++;
 	hero->placeBubbleNumber--;
 	Sprite * bubble;
 	bubble = Sprite::createWithSpriteFrameName("bubbleCenter1.png");

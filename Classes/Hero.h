@@ -2,7 +2,6 @@
 #define __HERO_H__
 
 #include "cocos2d.h"
-#include<list>
 
 typedef enum
 {
@@ -15,6 +14,14 @@ typedef enum
 	HERO_7,
 	HERO_8
 } HeroTag;
+
+
+class bubblePosition{
+public:
+	int tileX, tileY;
+	cocos2d::Vec2 position;
+};
+
 
 class Hero : public cocos2d::Sprite
 {
@@ -47,12 +54,13 @@ public:
 	void setPosition(const cocos2d::Vec2 &position);
 	cocos2d::Vec2 getPosition();//用于人物绘制
 	cocos2d::Vec2 getCenterPosition();//用于逻辑判断
-	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);//用于移动英雄
+	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode, std::list<bubblePosition>bubblePos);//用于移动英雄
 	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);//英雄静止时重置图像
 
-	
+	bool checkBubble(cocos2d::Vec2 position, std::list<bubblePosition>bubblePos);
+
+	int countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2);
 
 };
-
 
 #endif //__FIGHTER_SPRITE_H__

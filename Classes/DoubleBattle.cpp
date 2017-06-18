@@ -237,13 +237,13 @@ void DoubleBattle::update(float dt)//每秒60次更新
 	}
 	if (validPress1)
 	{
-		hero->moveHero(onPressCode1);
+		hero->moveHero(onPressCode1, bubble->bubblePos);
 		hero->setAnimationPlaying(true);
 	}
 
 	if (validPress2)
 	{
-		hero2->moveHero(onPressCode2);
+		hero2->moveHero(onPressCode2, bubble->bubblePos);
 		hero2->setAnimationPlaying(true);
 	}
 

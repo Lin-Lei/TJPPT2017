@@ -78,6 +78,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("music/backgroundmusic.mp3");
 	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("music/gamestartmusic.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("music/clip.mp3");
+	//FileUtils::getInstance()->addSearchPath("fonts/");
 
     return true;
 }

@@ -71,14 +71,16 @@ void Hero::setPosition(const Vec2 &position)
 	float pos_x = position.x;
 	float pos_y = position.y;
 
+
 	heroPosition = Vec2(pos_x, pos_y);
 	centerPosition = Vec2(pos_x, pos_y + 14);
+	log("%f, %f", centerPosition.x, centerPosition.y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }
 
 //人物移动
-void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
+void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePosition>bubblePos)
 {
 	Vec2 centerPos;
 	Vec2 position = heroPosition;
@@ -94,6 +96,9 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 	int tileGid1;
 	int tileGid2;
 	int centerGid;
+	int turn;
+
+	bool bubble1, bubble2, centerBubble;//泡泡碰撞
 
 
 	if (playerNo == 1)
@@ -112,9 +117,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveLeftAnimate));
 			}
 			centerPos.x -= movingSpeed;
-			if (centerPos.x <= 20 + 20)
+			if (centerPos.x < 20 + 20)
 			{
 				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 + 1;
+				break;
+			}
+			else if (centerPos.x == 20 + 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x - 20;
@@ -126,15 +135,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
 
-			if (tileGid1 || tileGid2)
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-
-				if (centerGid == 0 )
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -174,9 +187,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			}
 
 			centerPos.x += movingSpeed;
-			if (centerPos.x >= 620 - 20)
+			if (centerPos.x > 620 - 20)
 			{
 				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 - 1;
+				break;
+			}
+			else if (centerPos.x == 620 - 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20;
@@ -188,13 +205,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -232,9 +255,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveDownAnimate));
 			}
 			centerPos.y -= movingSpeed;
-			if (centerPos.y <= 40 + 20)
+			if (centerPos.y < 40 + 20)
 			{
 				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 + 1;
+				break;
+			}
+			else if (centerPos.y == 40 + 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -246,13 +273,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -290,9 +323,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveUpAnimate));
 			}
 			centerPos.y += movingSpeed;
-			if (centerPos.y >= 560 - 20)
+			if (centerPos.y > 560 - 20)
 			{
 				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 - 1;
+				break;
+			}
+			else if (centerPos.y == 560 - 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -304,13 +341,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -359,9 +402,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveLeftAnimate));
 			}
 			centerPos.x -= movingSpeed;
-			if (centerPos.x <= 20 + 20)
+			if (centerPos.x < 20 + 20)
 			{
 				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 + 1;
+				break;
+			}
+			else if (centerPos.x == 20 + 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x - 20;
@@ -373,13 +420,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -418,9 +471,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			}
 
 			centerPos.x += movingSpeed;
-			if (centerPos.x >= 620 - 20)
+			if (centerPos.x > 620 - 20)
 			{
 				position.x = 20 + tileCoordFromPosition(heroPosition).x * 40 + 20 - 1;
+				break;
+			}
+			else if (centerPos.x == 620 - 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20;
@@ -432,13 +489,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -476,9 +539,13 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				runAction(RepeatForever::create(moveDownAnimate));
 			}
 			centerPos.y -= movingSpeed;
-			if (centerPos.y <= 40 + 20)
+			if (centerPos.y < 40 + 20)
 			{
 				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 + 1;
+				break;
+			}
+			else if (centerPos.y == 40 + 20)
+			{
 				break;
 			}
 			collisionPos1.x = centerPos.x + 20 - 1;
@@ -490,13 +557,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -539,6 +612,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 				position.y = 560 - tileCoordFromPosition(heroPosition).y * 40 - 34 - 1;
 				break;
 			}
+			else if (centerPos.y == 560 - 20)
+			{
+				break;
+			}
 			collisionPos1.x = centerPos.x + 20 - 1;
 			collisionPos1.y = centerPos.y + 20;
 			collisionPos2.x = centerPos.x - 20 + 1;
@@ -548,13 +625,19 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode)
 			tileGid1 = building->getTileGIDAt(tileCoord1);
 			tileGid2 = building->getTileGIDAt(tileCoord2);
 
-			if (tileGid1 || tileGid2)
+			bubble1 = checkBubble(tileCoord1, bubblePos);
+			bubble2 = checkBubble(tileCoord2, bubblePos);
+
+			turn = countCol(tileGid1, tileGid2, bubble1, bubble2);
+
+			if (tileGid1 || tileGid2 || bubble1 || bubble2)
 			{
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
 				centerGid = building->getTileGIDAt(centerCoord);
-				if (centerGid == 0)
+				centerBubble = checkBubble(centerCoord, bubblePos);
+				if (centerGid == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -732,4 +815,28 @@ Vec2 Hero::getPosition()
 Vec2 Hero::getCenterPosition()
 {
 	return centerPosition;
+}
+
+bool Hero::checkBubble(Vec2 position, std::list<bubblePosition>bubblePos)
+{
+	bool check = false;
+	for (auto Pos : bubblePos)
+	{
+		if (position.x == Pos.tileX && position.y == Pos.tileY)
+		{
+			check = true;
+			break;
+		}
+	}
+	return check;
+}
+
+int Hero::countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2)
+{
+	int count = 0;
+	if (tileGid1) count++;
+	if (tileGid2) count++;
+	if (bubble1) count++;
+	if (bubble2) count++;
+	return count;
 }

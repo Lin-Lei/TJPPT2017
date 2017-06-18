@@ -5,6 +5,7 @@
 #include"Hero.h"
 #include<list>
 
+
 class bubbleInformation {
 public:
 	cocos2d::Sprite *bubble;
@@ -29,6 +30,7 @@ public:
 };
 
 
+
 class Bubble : public cocos2d::Sprite
 {
 	void bubbleBoom(Hero * hero);
@@ -40,7 +42,7 @@ class Bubble : public cocos2d::Sprite
 
 	void resetPlaceBubbleNum(Hero* hero);
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
-	cocos2d::Vec2 getPlacePosition(cocos2d::Vec2 pos,bubbleInformation *bInfo);
+	cocos2d::Vec2 getPlacePosition(cocos2d::Vec2 pos,bubbleInformation *bInfo,bubblePosition *bPos);
 	void eraseFront();
 	bool judgeReBoom(cocos2d::Vec2 pos);
 	bool judgeBuilding(cocos2d::Vec2 pos);
@@ -51,12 +53,11 @@ class Bubble : public cocos2d::Sprite
 
 public:
 	std::list<bubbleInformation>bubbleInfo;
+	std::list<bubblePosition>bubblePos;
 	Hero* player1,* player2;
 	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	static Bubble* create(const std::string &filename);
 	void placeBubble(cocos2d::Vec2 pos,Hero* hero);
 };
-
-
 
 #endif //__FIGHTER_SPRITE_H__
