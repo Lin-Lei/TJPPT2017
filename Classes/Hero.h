@@ -26,11 +26,7 @@ public:
 class Hero : public cocos2d::Sprite
 {
 	CC_SYNTHESIZE(bool, animationPlaying, AnimationPlaying);
-	cocos2d::TMXLayer* shoseLayer;
-	cocos2d::TMXLayer* powerLayer;
-	cocos2d::TMXLayer* numLayer;
 	cocos2d::TMXLayer* propLayer;
-	cocos2d::TMXLayer* barrierLayer;
 	int playerNo;
 	cocos2d::Vec2 heroPosition;//用于人物绘制
 	cocos2d::Vec2 centerPosition;//用于逻辑判断
@@ -39,11 +35,12 @@ class Hero : public cocos2d::Sprite
 public:
 	bool trapped,die;
 	void toDie();
+	cocos2d::TMXLayer* barrierLayer;
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* map;
 	void win();
 	void becomeDie();
-	void setScene(cocos2d::TMXLayer* buiding, cocos2d::TMXTiledMap* map);//标记他是在哪个场景
+	void setScene(cocos2d::TMXLayer* buiding ,cocos2d::TMXLayer* barrier,cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	void judgeOnProps(const cocos2d::Vec2 pos);
 
 	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;

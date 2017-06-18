@@ -22,6 +22,7 @@ public:
 	static cocos2d::Scene* createScene();
 
 	cocos2d::TMXLayer* building;
+	cocos2d::TMXLayer* barrierLayer;
 	cocos2d::TMXTiledMap* doubleBattleMap;//指向地图的
 
 	virtual bool init();

@@ -36,6 +36,7 @@ bool DoubleBattle::init() {
 	addChild(doubleBattleMap, 1);
 
 	building = doubleBattleMap->getLayer("building");
+	barrierLayer = doubleBattleMap->getLayer("barrier");
 
 	//·µ»ØÍ¼Æ¬²Ëµ¥
 	auto returnItem = MenuItemImage::create(
@@ -58,13 +59,13 @@ bool DoubleBattle::init() {
 	this->addChild(bubble, 9);
 
 	hero = Hero::create("hero1Down.png", 1);
-	hero->setScene(building, doubleBattleMap);
-	bubble->setScene(building, doubleBattleMap);
+	hero->setScene(building, barrierLayer, doubleBattleMap);
+	bubble->setScene(building, barrierLayer, doubleBattleMap);
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
 	hero2 = Hero::create("hero2Down.png", 2);
-	hero2->setScene(building, doubleBattleMap);
+	hero2->setScene(building, barrierLayer, doubleBattleMap);
 	hero2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero2, 10, HERO_2);
 

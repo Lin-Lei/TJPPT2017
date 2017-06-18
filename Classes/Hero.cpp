@@ -21,14 +21,11 @@ Vec2 Hero::tileCoordFromPosition(Vec2 position)//拿到的是人物在整个场景中的坐标,
 	return Vec2(x, y);
 }
 
-void Hero::setScene(TMXLayer* Building,TMXTiledMap* Map) {
+void Hero::setScene(TMXLayer* Building,TMXLayer* Barrier,TMXTiledMap* Map) {
 	building = Building;
 	map = Map;
-	shoseLayer = map->getLayer("speed");
-	powerLayer = map->getLayer("bubblePower");
-	numLayer = map->getLayer("bubbleNum");
 	propLayer = map->getLayer("prop");
-	barrierLayer = map->getLayer("barrier");
+	barrierLayer = Barrier;
 }
 
 
@@ -75,7 +72,7 @@ void Hero::setPosition(const Vec2 &position)
 
 	heroPosition = Vec2(pos_x, pos_y);
 	centerPosition = Vec2(pos_x, pos_y + 14);
-	log("%f, %f", centerPosition.x, centerPosition.y);
+	//log("%f, %f", centerPosition.x, centerPosition.y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }

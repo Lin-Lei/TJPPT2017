@@ -20,7 +20,7 @@ public:
 
 	cocos2d::TMXLayer* building;
 	cocos2d::TMXTiledMap* oneTrainMap;//指向地图的
-
+	cocos2d::TMXLayer* barrierLayer;
 	virtual bool init();
 	virtual void OneTrain::update(float dt);
 	virtual void OneTrain::onEnterTransitionDidFinish();

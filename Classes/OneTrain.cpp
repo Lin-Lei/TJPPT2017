@@ -36,6 +36,7 @@ bool OneTrain::init(){
 	addChild(oneTrainMap, 1);
 	
 	building = oneTrainMap->getLayer("building");
+	barrierLayer = oneTrainMap->getLayer("barrier");
 	
 	//·µ»ØÍ¼Æ¬²Ëµ¥
 	auto returnItem = MenuItemImage::create(
@@ -56,8 +57,8 @@ bool OneTrain::init(){
 	bubble->setPosition(Vec2(origin.x , origin.y ));
 	this->addChild(bubble, 9);
 	hero = Hero::create("hero1Down.png");
-	hero->setScene(building, oneTrainMap);
-	bubble->setScene(building, oneTrainMap);
+	hero->setScene(building, barrierLayer, oneTrainMap);
+	bubble->setScene(building, barrierLayer, oneTrainMap);
 	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
 	this->addChild(hero, 10, HERO_1);
 
