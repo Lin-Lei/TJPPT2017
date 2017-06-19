@@ -87,6 +87,7 @@ bool Bubble::judgeBuilding(Vec2 pos) {
 
 void Bubble::judgeBoomHero(Hero *hero,int x,int y) {
 	if (hero->trapped) return;
+	log("boomherox=%d y=%d", x, y);
 	int heroX, heroY;
 	Vec2 tilePos = tileCoordFromPosition(hero->centerPosition);
 	heroX = tilePos.x+0.3;//防止浮点误差
@@ -189,11 +190,12 @@ void Bubble::bubbleBoom(bubbleInformation bInfo) {
 void Bubble::down(bubbleInformation bInfo) {//坐标是反的
 	if (bInfo.power > 1) {
 		for (int p = 1; p < bInfo.power; p++) {
+			log("down");
 			if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y - 40 * p))) return;
 			boomInSameTime(bInfo.tileX, bInfo.tileY + p);
 			if (judgeReBoom(Vec2(bInfo.position.x, bInfo.position.y - 40 * p))) return;
 			judgeBoomHero(player1, bInfo.tileX, bInfo.tileY +p);
-			if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY- p);
+			if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY+ p);
 			Sprite * temp;
 			temp = Sprite::createWithSpriteFrameName("down1.png");
 			temp->setPosition(Vec2(bInfo.position.x, bInfo.position.y - 40 * p));
@@ -209,10 +211,11 @@ void Bubble::down(bubbleInformation bInfo) {//坐标是反的
 			temp->runAction(bubbleAction);
 		}
 	}
+	log("down");
 	if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y - 40 * bInfo.power))) return;
 	boomInSameTime(bInfo.tileX, bInfo.tileY + bInfo.power);
 	judgeBoomHero(player1, bInfo.tileX, bInfo.tileY+ bInfo.power);
-	if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY- bInfo.power);
+	if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY+ bInfo.power);
 	Sprite * bubble;
 	bubble = Sprite::createWithSpriteFrameName("downSpout1.png");
 	bubble->setPosition(Vec2(bInfo.position.x, bInfo.position.y - 40 * bInfo.power));
@@ -230,12 +233,12 @@ void Bubble::down(bubbleInformation bInfo) {//坐标是反的
 void Bubble::up(bubbleInformation bInfo) {
 	if (bInfo.power > 1) {
 		for (int p = 1; p < bInfo.power; p++) {
-			//log("up");
+			log("up");
 			if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y + 40 * p))) return;
 			boomInSameTime(bInfo.tileX, bInfo.tileY - p);
 			if (judgeReBoom(Vec2(bInfo.position.x, bInfo.position.y + 40 * p))) return;
-			judgeBoomHero(player1, bInfo.tileX, bInfo.tileY- p);
-			if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY+ p);
+			judgeBoomHero(player1, bInfo.tileX, bInfo.tileY-p);
+			if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY- p);
 			Sprite * temp;
 			temp = Sprite::createWithSpriteFrameName("up1.png");
 			temp->setPosition(Vec2(bInfo.position.x, bInfo.position.y + 40 * p));
@@ -251,10 +254,10 @@ void Bubble::up(bubbleInformation bInfo) {
 			temp->runAction(bubbleAction);
 		}
 	}
-	//log("up");
+	log("up");
 	if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y + 40 * bInfo.power))) return;
 	judgeBoomHero(player1, bInfo.tileX, bInfo.tileY- bInfo.power);
-	if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY+ bInfo.power);
+	if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY- bInfo.power);
 	boomInSameTime(bInfo.tileX, bInfo.tileY - bInfo.power);
 	Sprite * bubble;	
 	bubble = Sprite::createWithSpriteFrameName("upSpout1.png");
