@@ -47,6 +47,6 @@ bool TwoExplain::init()
 
 void TwoExplain::menuBeginCallBack(Ref * pSender) {
 	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
-	auto dobuleBattleScene = DoubleBattle::createScene();
-	Director::getInstance()->replaceScene(dobuleBattleScene);
+	auto choseMapScene = ChoseMap::createScene();
+	Director::getInstance()->replaceScene(choseMapScene);
 }

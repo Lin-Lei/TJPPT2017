@@ -2,8 +2,8 @@
 #define __TWOPLAYERSEXPLAIN_SCENE_H__
 
 #include "cocos2d.h"
-#include"DoubleBattle.h"
 #include"SimpleAudioEngine.h"
+#include"choseMapScene.h"
 
 class TwoExplain : public cocos2d::Layer
 {

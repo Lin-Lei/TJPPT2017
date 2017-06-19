@@ -21,18 +21,23 @@ bool RoomScene::init()
 		return false;
 	}
 	finish = false;
+	judge = false;
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	mid = Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2);
 
-	
+	ipText = TextFieldTTF::textFieldWithPlaceHolder("Please input server's ip address:", "fonts/arial.ttf", 40);
+	ipText->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+	ipText->setColor(Color3B::BLACK);
+	this->addChild(ipText, 25);
+	ipText->attachWithIME();
 
 	text = TextFieldTTF::textFieldWithPlaceHolder("Please input:", "fonts/arial.ttf", 32);
 	text->setPosition(Vec2(origin.x + visibleSize.width / 2 - 200, origin.y + visibleSize.height / 2 - 50));
 	text->setColor(Color3B::BLACK);
 	this->addChild(text, 20);
 
-	recvText = TextFieldTTF::textFieldWithPlaceHolder("", "fonts/arial.ttf", 32)	;
+	recvText = TextFieldTTF::textFieldWithPlaceHolder("", "fonts/arial.ttf", 32);
 	recvText->setPosition(Vec2(origin.x + visibleSize.width / 2 + 200, origin.y + visibleSize.height / 2 - 50));
 	recvText->setColor(Color3B::BLACK);
 	this->addChild(recvText, 20);
@@ -69,17 +74,25 @@ void RoomScene::onEnter() {
 	auto listener = cocos2d::EventListenerKeyboard::create();
 	listener->onKeyPressed = [&](EventKeyboard::KeyCode keyCode, Event *event) {
 		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER) {
-//			log("enter");
-			std::string s = text->getString();
-			const char *out = s.c_str();
-			send(sockClient, out, strlen(out)+1, 0);
-			text->setString("");
-			text->detachWithIME();//关闭键盘输入
-			recv(sockClient, recvBuf, 100, 0);
-//			log("recieve suceed")
-			const std::string m(recvBuf);
-			recvText->setString(m);
-			text->attachWithIME();//接收消息之后，打开键盘输入
+			if (!judge) {
+				std::string s = ipText->getString();
+				const char *out = s.c_str();
+				for (int i = 0; i < strlen(out); i++) ipAddres[i] = out[i];
+				ipAddres[strlen(out)] = '\0';
+				judge = true;
+				ipText->removeFromParent();
+			}
+			if (judge) {
+				std::string s = text->getString();
+				const char *out = s.c_str();
+				send(sockClient, out, strlen(out) + 1, 0);
+				text->setString("");
+				text->detachWithIME();//关闭键盘输入
+				recv(sockClient, recvBuf, 100, 0);
+				const std::string m(recvBuf);
+				recvText->setString(m);
+				text->attachWithIME();//接收消息之后，打开键盘输入
+			}
 		}
 	};
 	EventDispatcher* eventDsipatcher = Director::getInstance()->getEventDispatcher();
@@ -119,7 +132,7 @@ void RoomScene::menuConnectRoomCallBack(Ref* pSender){//client
 
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	sockClient = socket(AF_INET, SOCK_STREAM, 0);
-	addrServer.sin_addr.S_un.S_addr = inet_addr("192.168.1.110");
+	addrServer.sin_addr.S_un.S_addr = inet_addr(ipAddres);
 	addrServer.sin_family = AF_INET;
 	addrServer.sin_port = htons(12527);//连接端口6000
 									  //连接到服务端

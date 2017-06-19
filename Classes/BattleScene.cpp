@@ -34,7 +34,7 @@ bool Battle::init(){
 		"button/onetrainnormal.jpg",
 		"button/onetrainselect.jpg",
 		CC_CALLBACK_1(Battle::menuOneTrainCallBack, this));
-	oneTrainMenuItem->setPosition(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2+50);
+	oneTrainMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2+50));
 
 	//·µ»ØÍ¼Æ¬²Ëµ¥
 	auto returnMenuItem = MenuItemImage::create(

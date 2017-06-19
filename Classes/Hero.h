@@ -2,6 +2,7 @@
 #define __HERO_H__
 
 #include "cocos2d.h"
+#include"SimpleAudioEngine.h"
 
 typedef enum
 {

@@ -12,11 +12,12 @@ class RoomScene : public cocos2d::Layer
 {
 	char sendBuf[100];//发送至客户端的字符串
 	char recvBuf[100];//接受客户端返回的字符串
+	char ipAddres[15];
 	SOCKET sockClient;
 	cocos2d::Size visibleSize;
 	cocos2d::Vec2 origin;
 	cocos2d::Vec2 mid;
-	bool finish;
+	bool finish, judge;
 public:
 	static cocos2d::Scene* createScene();
 	virtual bool init();
@@ -26,6 +27,7 @@ public:
 	virtual void cleanup();
 	cocos2d::TextFieldTTF* text;
 	cocos2d::TextFieldTTF* recvText;
+	cocos2d::TextFieldTTF* ipText;
 	CREATE_FUNC(RoomScene);
 };
 

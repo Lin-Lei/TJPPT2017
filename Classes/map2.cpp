@@ -1,4 +1,4 @@
-#include"DoubleBattle.h"
+#include"Map2.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -7,15 +7,15 @@ extern bool musicSet;
 extern bool first;
 extern bool soundSet;
 
-Scene* DoubleBattle::createScene() {
+Scene* Map2::createScene() {
 	auto scene = Scene::create();
-	auto layer = DoubleBattle::create();
+	auto layer = Map2::create();
 	scene->addChild(layer);
 	return scene;
 }
 
 
-bool DoubleBattle::init() {
+bool Map2::init() {
 	if (!Layer::init()) {
 		return false;
 	}
@@ -24,24 +24,24 @@ bool DoubleBattle::init() {
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	//创建外边款
-	auto doubleBattleScene = Sprite::create("background/_battle.jpg");
-	doubleBattleScene->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
-	addChild(doubleBattleScene, 0);
+	auto Map1Scene = Sprite::create("background/_battle.jpg");
+	Map1Scene->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+	addChild(Map1Scene, 0);
 
-	//创建个人训练地图
-	doubleBattleMap = TMXTiledMap::create("map/map3/map3.tmx");
-	doubleBattleMap->setAnchorPoint(Vec2(0.5, 0.5));
-	doubleBattleMap->setPosition(Vec2(origin.x + visibleSize.width / 2 - 80, origin.y + visibleSize.height / 2));
-	addChild(doubleBattleMap, 1);
+	//创建双人对战地图
+	map2 = TMXTiledMap::create("map/map2/map2.tmx");
+	map2->setAnchorPoint(Vec2(0.5, 0.5));
+	map2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 80, origin.y + visibleSize.height / 2));
+	addChild(map2, 1);
 
-	building = doubleBattleMap->getLayer("building");
-	barrierLayer = doubleBattleMap->getLayer("barrier");
+	building = map2->getLayer("building");
+	barrierLayer = map2->getLayer("barrier");
 
 	//返回图片菜单
 	auto returnItem = MenuItemImage::create(
 		"button/backnormal.jpg",
 		"button/backselect.jpg",
-		CC_CALLBACK_1(DoubleBattle::menuReturnCallback, this));
+		CC_CALLBACK_1(Map2::menuReturnCallback, this));
 	returnItem->setPosition(Vec2(origin.x + visibleSize.width - 85,
 		origin.y + 25));
 	auto menu = Menu::create(returnItem, NULL);
@@ -58,14 +58,14 @@ bool DoubleBattle::init() {
 	this->addChild(bubble, 9);
 
 	hero = Hero::create("hero1Down.png", 1);
-	hero->setScene(building, barrierLayer, doubleBattleMap);
-	bubble->setScene(building, barrierLayer, doubleBattleMap);
-	hero->setPosition(Vec2(160, 60));
+	hero->setScene(building, barrierLayer, map2);
+	bubble->setScene(building, barrierLayer, map2);
+	hero->setPosition(Vec2(160, 50));
 	this->addChild(hero, 10, HERO_1);
 
 	hero2 = Hero::create("hero2Down.png", 2);
-	hero2->setScene(building, barrierLayer, doubleBattleMap);
-	hero2->setPosition(Vec2(160, 60));
+	hero2->setScene(building, barrierLayer, map2);
+	hero2->setPosition(Vec2(480, 530));
 	this->addChild(hero2, 10, HERO_2);
 
 	bubble->player1 = hero;
@@ -129,7 +129,7 @@ bool DoubleBattle::init() {
 	//松开时调用
 	heroKeyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (checkArrow(keyCode)&&!hero->trapped)
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			pressCnt1--;
 			keyCodeMap1[keyCode] = false;
@@ -201,14 +201,14 @@ bool DoubleBattle::init() {
 }
 
 //进入游戏场景
-void DoubleBattle::onEnterTransitionDidFinish() {
+void Map2::onEnterTransitionDidFinish() {
 	Layer::onEnterTransitionDidFinish();
 	if (musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3", true);
 	first = true;
 }
 
 //清除场景
-void DoubleBattle::cleanup() {
+void Map2::cleanup() {
 	Layer::cleanup();
 	if (musicSet) {
 		SimpleAudioEngine::getInstance()->stopBackgroundMusic("music/vitory.mp3");
@@ -217,22 +217,22 @@ void DoubleBattle::cleanup() {
 }
 
 //返回主界面
-void DoubleBattle::menuReturnCallback(cocos2d::Ref* pSender) {
+void Map2::menuReturnCallback(cocos2d::Ref* pSender) {
 	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
 	Director::getInstance()->popScene();
 }
 
-void DoubleBattle::update(float dt)//每秒60次更新
+void Map2::update(float dt)//每秒60次更新
 {
 	if (hero->die) {//?????
 		hero2->win();
 		hero->die = false;
 		auto winHeroPic = Sprite::create("hero/hero2Win3.png");
 		winHeroPic->setPosition(Vec2(250, 300));
-		this->addChild(winHeroPic,25);
+		this->addChild(winHeroPic, 25);
 		auto winPic = Sprite::create("hero/Win.png");
 		winPic->setPosition(Vec2(400, 300));
-		this->addChild(winPic,20);
+		this->addChild(winPic, 20);
 	}
 	if (hero2->die) {
 		hero->win();
@@ -242,7 +242,7 @@ void DoubleBattle::update(float dt)//每秒60次更新
 		this->addChild(winHeroPic, 25);
 		auto winPic = Sprite::create("hero/Win.png");
 		winPic->setPosition(Vec2(400, 300));
-		this->addChild(winPic,20);
+		this->addChild(winPic, 20);
 	}
 	if (validPress1)
 	{
@@ -258,7 +258,7 @@ void DoubleBattle::update(float dt)//每秒60次更新
 
 }
 
-void DoubleBattle::resetKeyCodeMap1()
+void Map2::resetKeyCodeMap1()
 {
 	keyCodeMap1[EventKeyboard::KeyCode::KEY_LEFT_ARROW] = false;
 	keyCodeMap1[EventKeyboard::KeyCode::KEY_RIGHT_ARROW] = false;
@@ -267,7 +267,7 @@ void DoubleBattle::resetKeyCodeMap1()
 
 }
 
-void DoubleBattle::resetKeyCodeMap2()
+void Map2::resetKeyCodeMap2()
 {
 	keyCodeMap2[EventKeyboard::KeyCode::KEY_A] = false;
 	keyCodeMap2[EventKeyboard::KeyCode::KEY_D] = false;
@@ -276,7 +276,7 @@ void DoubleBattle::resetKeyCodeMap2()
 
 }
 
-bool DoubleBattle::checkArrow(EventKeyboard::KeyCode keyCode)//检测P1按键
+bool Map2::checkArrow(EventKeyboard::KeyCode keyCode)//检测P1按键
 {
 	return (keyCode == EventKeyboard::KeyCode::KEY_LEFT_ARROW
 		|| keyCode == EventKeyboard::KeyCode::KEY_RIGHT_ARROW
@@ -284,7 +284,7 @@ bool DoubleBattle::checkArrow(EventKeyboard::KeyCode keyCode)//检测P1按键
 		|| keyCode == EventKeyboard::KeyCode::KEY_DOWN_ARROW);
 }
 
-bool DoubleBattle::checkP2(EventKeyboard::KeyCode keyCode)//检测P2按键
+bool Map2::checkP2(EventKeyboard::KeyCode keyCode)//检测P2按键
 {
 	return (keyCode == EventKeyboard::KeyCode::KEY_A
 		|| keyCode == EventKeyboard::KeyCode::KEY_D

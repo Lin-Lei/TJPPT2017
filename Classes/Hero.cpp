@@ -1,6 +1,9 @@
 #include "Hero.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
+extern bool musicSet;
+
 
 void Hero::innitAnimation(Animation * ani, int n, const char s[]) {//成功优化，美滋滋,大幅减小代码数量
 	for (int i = 1; i <= n; i++)
@@ -829,12 +832,13 @@ void Hero::becomeDie() {
 
 void Hero::win() {
 	trapped = true;
-	stopAllActions();
+	if (musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/victory.mp3",true);
 	Animation *winAnimation = Animation::create();
 	if(playerNo==1) innitAnimation(winAnimation, 3, "hero1Win");
 	else innitAnimation(winAnimation, 3, "hero2Win");
 	winAnimation->setDelayPerUnit(0.3f);
 	Animate *winAnimate = Animate::create(winAnimation);
+	stopAllActions();
 	runAction(RepeatForever::create(winAnimate));
 }
 

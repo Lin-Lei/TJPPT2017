@@ -4,6 +4,7 @@ USING_NS_CC;
 using namespace CocosDenshion;
 
 extern bool musicSet;
+extern bool soundSet;
 
 Bubble* Bubble::create(const std::string& spriteFrameName)
 {
@@ -73,7 +74,7 @@ bool Bubble::judgeBuilding(Vec2 pos) {
 	--tileCoord.x;//为什么？
 	int x = tileCoord.x;
 	int y = tileCoord.y;
-	if (x<0||y<=0||x>=15||y>=13) return true;//还有问题
+	if (x<0||y<0||x>=15||y>=13) return true;//还有问题
 	int tileGid = building->getTileGIDAt(tileCoord);
 	if (tileGid) {//如果遇到可被炸毁的建筑物
 		building->removeTileAt(tileCoord);
@@ -181,7 +182,7 @@ void Bubble::bubbleBoom(bubbleInformation bInfo) {
 		if (i.tileX == bInfo.tileX&&i.tileY == bInfo.tileY) i.judge = true;
 	}
 	bubble->runAction(action);
-	if(musicSet) SimpleAudioEngine::getInstance()->playEffect("music/boom.mp3");
+	if(soundSet) SimpleAudioEngine::getInstance()->playEffect("music/boom.mp3");
 }
 
 
