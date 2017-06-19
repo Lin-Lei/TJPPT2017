@@ -98,7 +98,7 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 	int tileGid2;
 	int tileGid3;//barrier²ãÅÐ¶Ï
 	int tileGid4;
-	int centerGid;
+	int centerGid1,centerGid2;
 	int turn;
 
 	bool bubble1, bubble2, centerBubble;//ÅÝÅÝÅö×²
@@ -151,9 +151,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0 )
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -224,9 +225,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -295,9 +297,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -366,9 +369,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -448,9 +452,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -520,9 +525,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (560 - centerPos.y - tileCoordFromPosition(centerPos).y * 40 > 20)
 					{
@@ -591,9 +597,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
@@ -662,9 +669,10 @@ void Hero::moveHero(const EventKeyboard::KeyCode keyCode, std::list<bubblePositi
 				collisionCenter.x = (collisionPos1.x + collisionPos2.x) / 2;
 				collisionCenter.y = (collisionPos1.y + collisionPos2.y) / 2;
 				centerCoord = tileCoordFromPosition(collisionCenter);
-				centerGid = building->getTileGIDAt(centerCoord);
+				centerGid1 = building->getTileGIDAt(centerCoord);
+				centerGid2 = barrierLayer->getTileGIDAt(centerCoord);
 				centerBubble = checkBubble(centerCoord, bubblePos);
-				if (centerGid == 0 && centerBubble == 0)
+				if (centerGid1 == 0 && centerGid2 == 0 && centerBubble == 0)
 				{
 					if (centerPos.x - tileCoordFromPosition(centerPos).x * 40 - 20 > 20)
 					{
