@@ -93,7 +93,7 @@ bool DoubleBattle::init() {
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
 		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER && !hero->trapped) {
-			bubble->placeBubble(hero->getPosition(), hero);//完成放泡泡功能
+			bubble->placeBubble(hero->getCenterPosition(), hero);//完成放泡泡功能
 		}
 		if (hero->getAnimationPlaying() && !hero->trapped)//正在做的动画停止
 		{

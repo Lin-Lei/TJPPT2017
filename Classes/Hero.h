@@ -43,8 +43,9 @@ public:
 	void setScene(cocos2d::TMXLayer* buiding ,cocos2d::TMXLayer* barrier,cocos2d::TMXTiledMap* map);//标记他是在哪个场景
 	void judgeOnProps(const cocos2d::Vec2 pos);
 
-	int bubblePower, bubbleNumber, placeBubbleNumber, movingSpeed;
-	Hero(int playerNo = 1, int power = 1, int speed = 3, int number = 1);
+	int bubblePower, bubbleNumber, placeBubbleNumber;
+	float movingSpeed;
+	Hero(int playerNo = 1, int power = 1, float speed = 2, int number = 1);
 
 	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
 	static Hero* create(const std::string &filename, int playerNo = 1);

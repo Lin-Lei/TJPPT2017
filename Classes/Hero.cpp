@@ -29,7 +29,7 @@ void Hero::setScene(TMXLayer* Building,TMXLayer* Barrier,TMXTiledMap* Map) {
 }
 
 
-Hero::Hero(int playerNo, int power, int speed, int number)
+Hero::Hero(int playerNo, int power, float speed, int number)
 {
 	this->playerNo = playerNo;
 	bubblePower = power;
@@ -784,7 +784,14 @@ void Hero::judgeOnProps(const Vec2 pos) {
 		std::string number = propValueMap["number"].asString();
 		std::string power = propValueMap["power"].asString();
 		if (speed == "true") {
-			if (movingSpeed <= 5) movingSpeed++;
+			if (movingSpeed <= 5)
+			{
+				if (movingSpeed - 2.0 < 0.01) movingSpeed += 0.7;
+				else if (movingSpeed - 2.7 < 0.01) movingSpeed += 0.7;
+				else if (movingSpeed - 3.4 < 0.01) movingSpeed += 0.8;
+				else if (movingSpeed - 4.2 < 0.01) movingSpeed += 0.8;
+			}
+			log("%f", movingSpeed);
 			propLayer->removeTileAt(tileCoord);
 		}
 		if (power == "true") {
