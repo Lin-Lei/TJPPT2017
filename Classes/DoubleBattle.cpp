@@ -30,7 +30,7 @@ bool DoubleBattle::init() {
 	addChild(doubleBattleScene, 0);
 
 	//创建个人训练地图
-	doubleBattleMap = TMXTiledMap::create("map/onetrainmap1.tmx");
+	doubleBattleMap = TMXTiledMap::create("map/map3/map3.tmx");
 	doubleBattleMap->setAnchorPoint(Vec2(0.5, 0.5));
 	doubleBattleMap->setPosition(Vec2(origin.x + visibleSize.width / 2 - 80, origin.y + visibleSize.height / 2));
 	addChild(doubleBattleMap, 1);
@@ -61,12 +61,12 @@ bool DoubleBattle::init() {
 	hero = Hero::create("hero1Down.png", 1);
 	hero->setScene(building, barrierLayer, doubleBattleMap);
 	bubble->setScene(building, barrierLayer, doubleBattleMap);
-	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
+	hero->setPosition(Vec2(160, 60));
 	this->addChild(hero, 10, HERO_1);
 
 	hero2 = Hero::create("hero2Down.png", 2);
 	hero2->setScene(building, barrierLayer, doubleBattleMap);
-	hero2->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
+	hero2->setPosition(Vec2(160, 60));
 	this->addChild(hero2, 10, HERO_2);
 
 	bubble->player1 = hero;

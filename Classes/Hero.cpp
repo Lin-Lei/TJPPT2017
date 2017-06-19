@@ -784,12 +784,12 @@ void Hero::judgeOnProps(const Vec2 pos) {
 		std::string number = propValueMap["number"].asString();
 		std::string power = propValueMap["power"].asString();
 		if (speed == "true") {
-			if (movingSpeed <= 5)
+			if (movingSpeed < 5 + 0.01)
 			{
-				if (movingSpeed - 2.0 < 0.01) movingSpeed += 0.7;
-				else if (movingSpeed - 2.7 < 0.01) movingSpeed += 0.7;
-				else if (movingSpeed - 3.4 < 0.01) movingSpeed += 0.8;
-				else if (movingSpeed - 4.2 < 0.01) movingSpeed += 0.8;
+				if (movingSpeed - 2.0 < 0.01) movingSpeed += 0.7f;
+				else if (movingSpeed - 2.7 < 0.01) movingSpeed += 0.7f;
+				else if (movingSpeed - 3.4 < 0.01) movingSpeed += 0.8f;
+				else if (movingSpeed - 4.2 < 0.01) movingSpeed += 0.8f;
 			}
 			log("%f", movingSpeed);
 			propLayer->removeTileAt(tileCoord);

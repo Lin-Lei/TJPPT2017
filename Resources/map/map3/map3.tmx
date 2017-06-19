@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="1">
+ <tileset firstgid="1" name="barrier" tilewidth="40" tileheight="75" tilecount="11" columns="11">
+  <image source="barrier.png" width="440" height="75"/>
+ </tileset>
+ <tileset firstgid="12" name="ground" tilewidth="40" tileheight="40" tilecount="16" columns="16">
+  <image source="ground.png" width="640" height="40"/>
+ </tileset>
+ <tileset firstgid="28" name="prop" tilewidth="40" tileheight="40" tilecount="3" columns="3">
+  <image source="prop.png" width="120" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="power" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="speed" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="number" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="31" name="building" tilewidth="40" tileheight="48" tilecount="3" columns="3">
+  <image source="building.png" width="120" height="48"/>
+ </tileset>
+ <layer name="ground" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJzjYWBg4IViPiAWwoN50NTyI8nxE9CLrpYSvYJI7hAgoJcYtcj+IiYccLmNGL8MBr3IYUJsuIyEtAEAhJEMxg==
+  </data>
+ </layer>
+ <layer name="prop" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxjYMAOZKC0LA55ZIBNjRwRYjJY1OADhNTDzCfVXGwAn7+x+Y1UM0h1IynxgM9sYswhBEhxO7Fhha6W2LgGAWqFDQBjpALU
+  </data>
+ </layer>
+ <layer name="building" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJydUlsKwDAM8iax97/k2EchOGdKBUnJU9IAX1CYoDlLCBP7q01w/TrKMOW690lO11HN94LG73aQ9O1Y2t2updg0t8S6uSmu+k72PP1ZB+HvyPW7uSNivukHzZcJAg==
+  </data>
+ </layer>
+ <layer name="barrier" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAOYKOCGRxAzAnEXEDMjUMNCxXsIRcw4ZFjJaAP5G5GLHKgcGNmwO4vRqg8JfYONkBMHJOSlqiZHgDW9ACM
+  </data>
+ </layer>
+</map>
