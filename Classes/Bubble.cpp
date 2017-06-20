@@ -29,9 +29,9 @@ void Bubble::setScene(TMXLayer* Building,TMXLayer* Barrier,TMXTiledMap* Map) {//
 
 Vec2 Bubble::tileCoordFromPosition(Vec2 position)//²ÎÊýÊÇÈËÎïÔÚÕû¸ö³¡¾°ÖÐµÄ×ø±ê,µÃµ½ÈËÎïÃªµãËùÔÚµÄÍßÆ¬×ø±ê
 {
-	int x = (position.x - 20) / map->getTileSize().width;//ÕýÈ·Âð£¿
+	int x = (position.x - 20) / map->getTileSize().width;
 	int y = (map->getMapSize().height*map->getTileSize().height - position.y + 40)
-		/ map->getTileSize().height;	//Ã»ÓÐ¿¼ÂÇÃªµã
+		/ map->getTileSize().height;
 	return Vec2(x, y);
 }
 
@@ -50,7 +50,7 @@ Vec2 Bubble::getPlacePosition(Vec2 position,bubbleInformation *bInfo,bubblePosit
 	bPos->tileY = bInfo->tileY = post.y;
 	
 	float x = post.x*map->getTileSize().width + map->getTileSize().width / 2 + 20 + this->getContentSize().width / 2;
-	float y= (map->getMapSize().height - post.y -1)*map->getTileSize().height +//ÎªÊ²Ã´£¿
+	float y= (map->getMapSize().height - post.y -1)*map->getTileSize().height +
 		map->getTileSize().height/2 + 40 + this->getContentSize().height / 2-1;
 	bPos->position.x=bInfo->position.x = x;
 	bPos->position.y=bInfo->position.y = y;
@@ -71,10 +71,10 @@ void Bubble::innitAnimation(Animation * ani, int n, const char s[]) {//³É¹¦ÓÅ»¯£
 //ÅÐ¶Ï½¨ÖþÎï£¬²¢½øÐÐÏû³ý¡£Í¬Ê±ÅÐ¶ÏÊÇ·ñ³öÁËÍßÆ¬µØÍ¼
 bool Bubble::judgeBuilding(Vec2 pos) {
 	Vec2 tileCoord = tileCoordFromPosition(pos);
-	--tileCoord.x;//ÎªÊ²Ã´£¿
+	--tileCoord.x;
 	int x = tileCoord.x;
 	int y = tileCoord.y;
-	if (x<0||y<0||x>=15||y>=13) return true;//»¹ÓÐÎÊÌâ
+	if (x<0||y<0||x>=15||y>=13) return true;
 	int tileGid = building->getTileGIDAt(tileCoord);
 	if (tileGid) {//Èç¹ûÓöµ½¿É±»Õ¨»ÙµÄ½¨ÖþÎï
 		building->removeTileAt(tileCoord);
@@ -87,7 +87,6 @@ bool Bubble::judgeBuilding(Vec2 pos) {
 
 void Bubble::judgeBoomHero(Hero *hero,int x,int y) {
 	if (hero->trapped) return;
-	log("boomherox=%d y=%d", x, y);
 	int heroX, heroY;
 	Vec2 tilePos = tileCoordFromPosition(hero->centerPosition);
 	heroX = tilePos.x+0.3;//·ÀÖ¹¸¡µãÎó²î
@@ -97,12 +96,11 @@ void Bubble::judgeBoomHero(Hero *hero,int x,int y) {
 	}
 }
 
-void Bubble::boomInSameTime(int x,int y) {//ÓÐbug
+void Bubble::boomInSameTime(int x,int y) {
 	auto it = bubbleInfo.begin();
 	for (; it != bubbleInfo.end(); it++) { 
 		if (it->tileX == x&&it->tileY==y&&!it->judge) {
-			//log("same");
-			it->bubble->removeFromParent();//ºÍplacebubbleÀïÃæµÄremove²»»áÖØ¸´£¿
+			it->bubble->removeFromParent();
 			bubbleBoom(*it);
 		}
 	}
@@ -190,7 +188,6 @@ void Bubble::bubbleBoom(bubbleInformation bInfo) {
 void Bubble::down(bubbleInformation bInfo) {//×ø±êÊÇ·´µÄ
 	if (bInfo.power > 1) {
 		for (int p = 1; p < bInfo.power; p++) {
-			log("down");
 			if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y - 40 * p))) return;
 			boomInSameTime(bInfo.tileX, bInfo.tileY + p);
 			if (judgeReBoom(Vec2(bInfo.position.x, bInfo.position.y - 40 * p))) return;
@@ -211,7 +208,6 @@ void Bubble::down(bubbleInformation bInfo) {//×ø±êÊÇ·´µÄ
 			temp->runAction(bubbleAction);
 		}
 	}
-	log("down");
 	if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y - 40 * bInfo.power))) return;
 	boomInSameTime(bInfo.tileX, bInfo.tileY + bInfo.power);
 	judgeBoomHero(player1, bInfo.tileX, bInfo.tileY+ bInfo.power);
@@ -233,7 +229,6 @@ void Bubble::down(bubbleInformation bInfo) {//×ø±êÊÇ·´µÄ
 void Bubble::up(bubbleInformation bInfo) {
 	if (bInfo.power > 1) {
 		for (int p = 1; p < bInfo.power; p++) {
-			log("up");
 			if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y + 40 * p))) return;
 			boomInSameTime(bInfo.tileX, bInfo.tileY - p);
 			if (judgeReBoom(Vec2(bInfo.position.x, bInfo.position.y + 40 * p))) return;
@@ -254,7 +249,6 @@ void Bubble::up(bubbleInformation bInfo) {
 			temp->runAction(bubbleAction);
 		}
 	}
-	log("up");
 	if (judgeBuilding(Vec2(bInfo.position.x, bInfo.position.y + 40 * bInfo.power))) return;
 	judgeBoomHero(player1, bInfo.tileX, bInfo.tileY- bInfo.power);
 	if (player2 != NULL) judgeBoomHero(player2, bInfo.tileX, bInfo.tileY- bInfo.power);

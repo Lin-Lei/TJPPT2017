@@ -75,7 +75,6 @@ void Hero::setPosition(const Vec2 &position)
 
 	heroPosition = Vec2(pos_x, pos_y);
 	centerPosition = Vec2(pos_x, pos_y + 14);
-	//log("%f, %f", centerPosition.x, centerPosition.y);
 	Sprite::setPosition(Vec2(pos_x, pos_y));
 	Sprite::setAnchorPoint(Vec2(0.5f, 0.1f));//人物锚点需要改进，边界问题
 }
@@ -802,7 +801,6 @@ void Hero::judgeOnProps(const Vec2 pos) {
 				else if (movingSpeed - 3.4 < 0.01) movingSpeed += 0.8f;
 				else if (movingSpeed - 4.2 < 0.01) movingSpeed += 0.8f;
 			}
-			log("%f", movingSpeed);
 			propLayer->removeTileAt(tileCoord);
 		}
 		if (power == "true") {
