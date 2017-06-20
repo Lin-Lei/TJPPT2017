@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="left-up" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="1">
+ <tileset firstgid="1" name="barrier" tilewidth="40" tileheight="67" tilecount="4" columns="4">
+  <image source="barrier.png" width="161" height="67"/>
+  <tile id="0">
+   <properties>
+    <property name="barrier" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="barrier" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="barrier" value="true"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="barrier" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="5" name="ground" tilewidth="40" tileheight="40" tilecount="7" columns="7">
+  <image source="ground.jpg" width="280" height="40"/>
+ </tileset>
+ <tileset firstgid="12" name="prop" tilewidth="40" tileheight="40" tilecount="3" columns="3">
+  <image source="prop.png" width="120" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="power" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="speed" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="number" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="15" name="building" tilewidth="40" tileheight="40" tilecount="3" columns="3">
+  <image source="building.png" width="120" height="44"/>
+ </tileset>
+ <layer name="ground" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxjZWBgYMWC2YGYC0pjk8eHh6JeDiRMT72jYTV4/AsAi4YERQ==
+  </data>
+ </layer>
+ <layer name="prop" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJy9kcEKADAIQvuA6v8/d6cg5BVsh3ka4tTQjBEDT0h4O+g6F8JRXgx/CKXLRdORxh01wy88f4P6E6q/3tbv0j1eciZv9dCtHLrZwL12Kq9tywPK5gHE
+  </data>
+ </layer>
+ <layer name="building" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJzNkkEKACAIBP1B+v/PdumwLGPYrQXJwHFJi2CVnTctyJ3LE1pHoawz1OPVl/yVUz6j53/QdEfdO5TzeRBPvrQDYvReUt/9AerhLPl2msxqAwgiA/c=
+  </data>
+ </layer>
+ <layer name="barrier" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMMKLR2AATDjaxgAmLPnrYiw5YKFTHgiaHrg5dDp85lLiDFEBsGOKKD2xxRw97yQEAcUwASQ==
+  </data>
+ </layer>
+</map>

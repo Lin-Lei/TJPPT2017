@@ -76,7 +76,7 @@ bool HelloWorld::init()
 //进入完成后加载函数
 void HelloWorld::onEnterTransitionDidFinish() {
 	Layer::onEnterTransitionDidFinish();
-	if(first&&musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/backgroundmusic.mp3");
+	if(first&&musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/backgroundmusic.mp3",true);
 	first = false;
 }
 

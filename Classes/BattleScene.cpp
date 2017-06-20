@@ -34,16 +34,30 @@ bool Battle::init(){
 		"button/onetrainnormal.jpg",
 		"button/onetrainselect.jpg",
 		CC_CALLBACK_1(Battle::menuOneTrainCallBack, this));
-	oneTrainMenuItem->setPosition(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2);
+	oneTrainMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2+50));
 
 	//返回图片菜单
 	auto returnMenuItem = MenuItemImage::create(
 		"button/backnormal.jpg",
 		"button/backselect.jpg",
 		CC_CALLBACK_1(Battle::menuReturnCallBack, this));
-	returnMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 50));
+	returnMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 100));
 
-	Menu *mn = Menu::create(oneTrainMenuItem,returnMenuItem, NULL);
+	//局域网对战图片菜单
+	auto onlineBattleMenuItem = MenuItemImage::create(
+		"button/onlinenormal.jpg",
+		"button/onlineselect.jpg",
+		CC_CALLBACK_1(Battle::menuOnlineBattleCallBack, this));
+	onlineBattleMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 - 50));
+
+	//双人对战图片菜单
+	auto doubleBattleMenuItem = MenuItemImage::create(
+		"button/doublenormal.jpg",
+		"button/doubleselect.jpg",
+		CC_CALLBACK_1(Battle::menuDoubleBattleCallBack, this));
+	doubleBattleMenuItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ));
+
+	Menu *mn = Menu::create(oneTrainMenuItem,returnMenuItem,doubleBattleMenuItem, onlineBattleMenuItem,NULL);
 	mn->setPosition(Vec2::ZERO);
 	this->addChild(mn,1);
 
@@ -60,6 +74,20 @@ void Battle::menuReturnCallBack(Ref * pSender) {
 //进入单人训练地图
 void Battle::menuOneTrainCallBack(Ref* pSender) {
 	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
-	auto oneTrainScene = OneTrain::createScene();
+	auto oneTrainScene = OneExplain::createScene();
 	Director::getInstance()->replaceScene(oneTrainScene);
+}
+
+//进入双人对战地图
+void Battle::menuDoubleBattleCallBack(Ref* pSender) {
+	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
+	auto doubleBattleScene = TwoExplain::createScene();
+	Director::getInstance()->replaceScene(doubleBattleScene);
+}
+
+//进入局域网对战地图
+void Battle::menuOnlineBattleCallBack(Ref* pSender) {
+	if (soundSet) SimpleAudioEngine::getInstance()->playEffect("music/clip.mp3");
+	auto onlineBattleScene = RoomScene::createScene();
+	Director::getInstance()->replaceScene(onlineBattleScene);
 }

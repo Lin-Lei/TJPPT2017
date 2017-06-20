@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="13" tilewidth="40" tileheight="40" nextobjectid="1">
+ <tileset firstgid="1" name="ground" tilewidth="40" tileheight="40" tilecount="2" columns="2">
+  <image source="ground.png" width="80" height="40"/>
+ </tileset>
+ <tileset firstgid="3" name="building" tilewidth="40" tileheight="47" tilecount="4" columns="4">
+  <image source="building.png" width="160" height="47"/>
+ </tileset>
+ <tileset firstgid="7" name="barrier" tilewidth="40" tileheight="61" tilecount="2" columns="2">
+  <image source="barrier.png" width="80" height="61"/>
+ </tileset>
+ <tileset firstgid="9" name="prop" tilewidth="40" tileheight="40" tilecount="3" columns="3">
+  <image source="prop.png" width="120" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="power" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="speed" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="number" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="ground" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYAJixlF6lB7hNADCOwEl
+  </data>
+ </layer>
+ <layer name="prop" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJyVUbENACAM6mr7/78uDg2BVlg0QghgBEe+swSv9B1n4ZnO5Qu8S9xdsLxJPDEb8phv0jI/9j5t6fg4YL16lm3rLY/qxP4WvX46/Wx2AS0CAWk=
+  </data>
+ </layer>
+ <layer name="building" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJylkgEKwDAIAwVr///kMTYhOxztZkDEmCgtml1weyKQ7UV3YoAPCfWNwpt8NfdrX/eufOrPHKiJeYfW1HmhmYWes8g5fJ291GVevZe+P//c6XfvSrFzzwcqagFp
+  </data>
+ </layer>
+ <layer name="barrier" width="15" height="13">
+  <data encoding="base64" compression="zlib">
+   eJzjYGBgYGfADjhwiLND5djx6MUFyNFDa4DuHnL9hE8fMWFJij5i7cWlDx9/oAEl6YqcsITpAwBymwDx
+  </data>
+ </layer>
+</map>

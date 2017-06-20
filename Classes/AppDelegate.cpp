@@ -3,8 +3,8 @@
 
 USING_NS_CC;
 
-static cocos2d::Size designResolutionSize = cocos2d::Size(900, 640);
-static cocos2d::Size smallResolutionSize = cocos2d::Size(900, 640);
+static cocos2d::Size designResolutionSize = cocos2d::Size(800, 600);
+static cocos2d::Size smallResolutionSize = cocos2d::Size(800, 600);
 static cocos2d::Size mediumResolutionSize = cocos2d::Size(1024, 768);
 static cocos2d::Size largeResolutionSize = cocos2d::Size(2048, 1536);
 
@@ -44,7 +44,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 #else
         glview = GLViewImpl::create("OurGame");
 #endif
-		glview->setFrameSize(1024,645);//改变屏幕大小
+		glview->setFrameSize(800, 600);//改变屏幕大小
         director->setOpenGLView(glview);
     }
 
@@ -77,7 +77,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	//初始化背景音乐
 	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("music/backgroundmusic.mp3");
 	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("music/gamestartmusic.mp3");
+	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("music/victory.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("music/clip.mp3");
+	SimpleAudioEngine::getInstance()->preloadEffect("music/boom.mp3");
 
     return true;
 }

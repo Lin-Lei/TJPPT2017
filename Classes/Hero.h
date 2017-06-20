@@ -2,6 +2,7 @@
 #define __HERO_H__
 
 #include "cocos2d.h"
+#include"SimpleAudioEngine.h"
 
 typedef enum
 {
@@ -15,26 +16,50 @@ typedef enum
 	HERO_8
 } HeroTag;
 
+
+class bubblePosition{
+public:
+	int tileX, tileY;
+	cocos2d::Vec2 position;
+};
+
+
 class Hero : public cocos2d::Sprite
 {
-	CC_SYNTHESIZE(int, bubblePower, BubblePower);
-	CC_SYNTHESIZE(int, movingSpeed, MovingSpeed);
-	CC_SYNTHESIZE(int, bubbleNumber, BubbleNumber);
-	CC_SYNTHESIZE(int, placedBubbleNum, PlacedBubbleNum);
 	CC_SYNTHESIZE(bool, animationPlaying, AnimationPlaying);
-
-	
+	cocos2d::TMXLayer* propLayer;
+	int playerNo;
+	cocos2d::Vec2 heroPosition;//用于人物绘制
+	cocos2d::Vec2 centerPosition;//用于逻辑判断
+	void innitAnimation(cocos2d::Animation * a, int n, const char s[]);
 
 public:
-	
-	Hero(int power = 1, int speed = 1, int number = 1);
+	bool trapped,die;
+	void toDie();
+	cocos2d::TMXLayer* barrierLayer;
+	cocos2d::TMXLayer* building;
+	cocos2d::TMXTiledMap* map;
+	void win();
+	void becomeDie();
+	void setScene(cocos2d::TMXLayer* buiding ,cocos2d::TMXLayer* barrier,cocos2d::TMXTiledMap* map);//标记他是在哪个场景
+	void judgeOnProps(const cocos2d::Vec2 pos);
 
-	static Hero* create(const std::string &filename);
+	int bubblePower, bubbleNumber, placeBubbleNumber;
+	float movingSpeed;
+	Hero(int playerNo = 1, int power = 1, float speed = 2, int number = 1);
 
+	cocos2d::Vec2 tileCoordFromPosition(cocos2d::Vec2 pos);
+	static Hero* create(const std::string &filename, int playerNo = 1);
+		
 	void setPosition(const cocos2d::Vec2 &position);
-	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode);
-	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);
-	void Hero::placeBubble(const cocos2d::Vec2 &position);
+	cocos2d::Vec2 getPosition();//用于人物绘制
+	cocos2d::Vec2 getCenterPosition();//用于逻辑判断
+	void moveHero(const cocos2d::EventKeyboard::KeyCode keyCode, std::list<bubblePosition>bubblePos);//用于移动英雄
+	void setFrame(const cocos2d::EventKeyboard::KeyCode keyCode);//英雄静止时重置图像
+
+	bool checkBubble(cocos2d::Vec2 position, std::list<bubblePosition>bubblePos);
+
+	int countCol(int tileGid1, int tileGid2, bool bubble1, bool bubble2, int tileGid3, int tileGid4);
 
 };
 

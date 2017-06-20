@@ -1,4 +1,5 @@
 #include"OneTrain.h"
+#include"Vector"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -29,27 +30,39 @@ bool OneTrain::init(){
 	addChild(oneTrainScene,0);
 
 	//创建个人训练地图
-	oneTrainMap = TMXTiledMap::create("map/onetrainmap.tmx");
+	oneTrainMap = TMXTiledMap::create("map/map1/map1.tmx");
 	oneTrainMap->setAnchorPoint(Vec2(0.5, 0.5));
-	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-75, origin.y + visibleSize.height / 2));
+	oneTrainMap->setPosition(Vec2(origin.x + visibleSize.width / 2-80, origin.y + visibleSize.height / 2));
 	addChild(oneTrainMap, 1);
 	
-	//退出图片菜单
-	auto closeItem = MenuItemImage::create(
+	building = oneTrainMap->getLayer("building");
+	barrierLayer = oneTrainMap->getLayer("barrier");
+	
+	//返回图片菜单
+	auto returnItem = MenuItemImage::create(
 		"button/backnormal.jpg",
 		"button/backselect.jpg",
 		CC_CALLBACK_1(OneTrain::menuReturnCallback, this));
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width -175,
-		origin.y + 45));
-	auto menu = Menu::create (closeItem, NULL);
+	returnItem->setPosition(Vec2(origin.x + visibleSize.width -85,
+		origin.y + 25));
+	auto menu = Menu::create (returnItem, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 2);
 
 	//创建人物
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero1Basic.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("hero/hero1Basic.plist");//缓存人物动画
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Bubble/bubble_all.plist");//缓存泡泡动画
+	bubble = Bubble::create("bubble0.png");
+	bubble->setAnchorPoint(Vec2(0.5f,0.5f));
+	bubble->setPosition(Vec2(origin.x , origin.y ));
+	this->addChild(bubble, 9);
 	hero = Hero::create("hero1Down.png");
-	hero->setPosition(Vec2(origin.x + visibleSize.width / 2 - 75, origin.y + visibleSize.height / 2));
+	hero->setScene(building, barrierLayer, oneTrainMap);
+	bubble->setScene(building, barrierLayer, oneTrainMap);
+	hero->setPosition(Vec2(160,50));
 	this->addChild(hero, 10, HERO_1);
+
+	bubble->player1 = hero;
 
 	//初始化Map容器
 	keyCodeMap = std::map<cocos2d::EventKeyboard::KeyCode, bool>();
@@ -61,16 +74,19 @@ bool OneTrain::init(){
 	//注册 键盘事件监听器
 	heroKeyboardListener = EventListenerKeyboard::create();
 	
-
+	//按下时调用
 	heroKeyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (hero->getAnimationPlaying())
+		if (keyCode == EventKeyboard::KeyCode::KEY_SPACE && !hero->trapped) {
+			bubble->placeBubble(hero->getCenterPosition(),hero);//完成放泡泡功能
+		}
+		if (hero->getAnimationPlaying() && !hero->trapped)//正在做的动画停止
 		{
 			hero->stopAllActions();
 			hero->setAnimationPlaying(false);
 		}
 		
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			validPress = true;
 			pressCnt++;
@@ -79,9 +95,10 @@ bool OneTrain::init(){
 		}
 	};
 
+	//松开时调用
 	heroKeyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event)
 	{
-		if (checkArrow(keyCode))
+		if (checkArrow(keyCode) && !hero->trapped)
 		{
 			pressCnt--;
 			keyCodeMap[keyCode] = false;
@@ -110,8 +127,6 @@ bool OneTrain::init(){
 				hero->setFrame(keyCode);
 			}
 		}
-		
-		
 	};
 
 	EventDispatcher* eventDispatcher = Director::getInstance()->getEventDispatcher();
@@ -125,7 +140,7 @@ bool OneTrain::init(){
 //进入游戏场景
 void OneTrain::onEnterTransitionDidFinish() {
 	Layer::onEnterTransitionDidFinish();
-	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3");
+	if(musicSet) SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestartmusic.mp3",true);
 	first = true;
 }
 
@@ -141,12 +156,12 @@ void OneTrain::menuReturnCallback(cocos2d::Ref* pSender) {
 	Director::getInstance()->popScene();
 }
 
-void OneTrain::update(float dt)
+void OneTrain::update(float dt)//每秒60次更新
 {
 
 	if (validPress)
 	{
-		hero->moveHero(onPressCode);
+		hero->moveHero(onPressCode, bubble->bubblePos);
 		hero->setAnimationPlaying(true);
 	}
 	
@@ -168,3 +183,4 @@ bool OneTrain::checkArrow(EventKeyboard::KeyCode keyCode)
 		|| keyCode == EventKeyboard::KeyCode::KEY_UP_ARROW
 		|| keyCode == EventKeyboard::KeyCode::KEY_DOWN_ARROW);
 }
+
